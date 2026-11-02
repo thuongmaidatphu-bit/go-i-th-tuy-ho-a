@@ -1,0 +1,1977 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1B2A6B">
+  <link rel="icon" href="./logo_datphu.jpg">
+  <title>Sàn Thương Mại Điện Tử Đất Phú — Chợ Phiên Số, Gọi Thợ 6K & Chatbot AI</title>
+  
+  <!-- Tailwind CSS & Font Awesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --dp-red: #D32027;
+      --dp-red-hover: #b51920;
+      --dp-blue: #1B2A6B;
+      --dp-blue-light: #e8ecf7;
+      --dp-gold: #F59E0B;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #f4f6fa;
+      color: #0f172a;
+    }
+    .dp-bg-red { background-color: var(--dp-red); }
+    .dp-bg-blue { background-color: var(--dp-blue); }
+    .dp-text-red { color: var(--dp-red); }
+    .dp-text-blue { color: var(--dp-blue); }
+    .dp-border-red { border-color: var(--dp-red); }
+    .dp-border-blue { border-color: var(--dp-blue); }
+    
+    .badge-shopee {
+      background: linear-gradient(135deg, #D32027 0%, #ff5252 100%);
+    }
+    .custom-scroll::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    .hero-gradient {
+      background: linear-gradient(135deg, #1B2A6B 0%, #152254 60%, #871318 100%);
+    }
+    .card-hover {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card-hover:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 28px -8px rgba(27, 42, 107, 0.12), 0 8px 12px -6px rgba(211, 32, 39, 0.08);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col pb-20 md:pb-0">
+
+  <!-- ================= TOPBAR THÔNG TIN & PHÁP LÝ SÀN ================= -->
+  <div class="dp-bg-blue text-white text-[11px] py-1.5 px-4 border-b border-white/10 hidden sm:block">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <span>🏛️ <b>CÔNG TY TNHH THƯƠNG MẠI ĐẤT PHÚ</b> (MST: 4401020233)</span>
+        <span class="opacity-80">• Số 21/146 Ngô Gia Tự, P. Phú Yên, TP. Tuy Hòa</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <span>🛡️ Chuẩn Kiểm Định 6K & Bảo Hành QR</span>
+        <span>🏦 Vietcombank: <b>0751000025858</b></span>
+        <span id="realtimeStatusPill" class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-400/30 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span>Ổ E: CSDL & Realtime Online</span>
+        </span>
+        <span id="authStatusText" class="font-bold"></span>
+        <a href="./auth_partner.html" class="text-amber-300 font-extrabold hover:underline flex items-center gap-1 bg-white/10 px-2 py-0.5 rounded-lg border border-white/20">
+          <i class="fa-solid fa-handshake"></i> <span>Cổng Đối Tác (Chủ Tiệm & Thợ 6K)</span>
+        </a>
+        <button id="authBtnModal" onclick="openAuthModal()" class="text-white font-bold hover:underline flex items-center gap-1">
+          <i class="fa-solid fa-user"></i> <span>Khách Hàng</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= HEADER CHÍNH & TÌM KIẾM ĐA KÊNH ================= -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-100">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3 md:gap-6">
+      
+      <!-- Logo Đất Phú Brand -->
+      <a href="./ecommerce_marketplace.html" class="flex items-center gap-2.5 shrink-0">
+        <div class="w-11 h-11 rounded-2xl dp-bg-red p-1 flex items-center justify-center shadow-md shadow-red-500/20">
+          <img src="./logo_datphu.jpg" alt="Đất Phú" class="w-full h-full object-cover rounded-xl" onerror="this.src='https://placehold.co/44x44/D32027/ffffff?text=DP'">
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-lg font-black tracking-tight dp-text-blue">ĐẤT PHÚ</span>
+            <span class="text-[10px] font-black uppercase text-white dp-bg-red px-1.5 py-0.5 rounded">MALL</span>
+          </div>
+          <div class="text-[10px] text-slate-500 font-bold tracking-wider">CHỢ PHIÊN • 6K • AI OS</div>
+        </div>
+      </a>
+
+      <!-- Thanh Tìm Kiếm Đa Năng -->
+      <div class="flex-1 max-w-2xl relative hidden md:block">
+        <div class="flex items-center rounded-2xl border-2 dp-border-blue bg-white overflow-hidden shadow-sm focus-within:ring-2 ring-red-400">
+          <div class="pl-3.5 pr-2 text-slate-400">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </div>
+          <input 
+            type="text" 
+            id="searchInput" 
+            oninput="handleSearch(this.value)" 
+            placeholder="Tìm Bò một nắng, Sách cũ, Xe máy biển 78, Gọi thợ điện nước, Sữa Meiji..." 
+            class="w-full py-2.5 px-2 text-xs md:text-sm text-slate-800 placeholder-slate-400 focus:outline-none"
+          >
+          <button onclick="executeSearch()" class="dp-bg-red hover:bg-red-700 text-white font-bold px-5 py-2.5 text-xs transition flex items-center gap-1.5 shrink-0">
+            <span>Tìm Kiếm</span>
+          </button>
+        </div>
+        <!-- Gợi ý tìm nhanh -->
+        <div class="flex items-center gap-2 mt-1.5 text-[11px] text-slate-500 overflow-x-auto custom-scroll whitespace-nowrap">
+          <span class="font-bold text-slate-600">Gợi ý hot:</span>
+          <button onclick="quickFilter('Bò Một Nắng')" class="hover:text-red-600">Bò một nắng Krông Pa</button>
+          <span>•</span>
+          <button onclick="quickFilter('Sách Cũ')" class="hover:text-red-600">Lô sách cũ tuyển chọn</button>
+          <span>•</span>
+          <button onclick="quickFilter('Thợ 6K')" class="hover:text-red-600">Tháo lắp máy lạnh 500K</button>
+          <span>•</span>
+          <button onclick="quickFilter('Xe Cũ')" class="hover:text-red-600">Xe máy cũ biển 78</button>
+          <span>•</span>
+          <button onclick="quickFilter('Cơm Chay')" class="hover:text-red-600">Mâm cỗ chay 8 món</button>
+        </div>
+      </div>
+
+      <!-- Action Buttons: Trợ lý AI, Gọi Thợ & Giỏ Hàng -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Nút Tải Tài Liệu & Ảnh Geostamp Lên Ổ E -->
+        <button onclick="openStorageModal()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold transition">
+          <i class="fa-solid fa-cloud-arrow-up text-amber-700"></i>
+          <span class="hidden xl:inline">File Storage Ổ E</span>
+        </button>
+
+        <!-- Nút Gọi Trợ Lý AI Chatbox -->
+        <a href="./zalo_ai_chat.html" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-50 hover:bg-red-100 dp-text-red border border-red-200 text-xs font-bold transition">
+          <i class="fa-solid fa-robot text-sm"></i>
+          <span class="hidden lg:inline">Trợ Lý AI 24/7</span>
+        </a>
+
+        <!-- Nút Gọi Thợ 6K Radar -->
+        <button onclick="openWorkerDispatchModal()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 dp-text-blue border border-blue-200 text-xs font-bold transition cursor-pointer">
+          <i class="fa-solid fa-wrench text-sm"></i>
+          <span class="hidden lg:inline">Gọi Thợ 6K</span>
+        </button>
+
+        <!-- Nút Giỏ Hàng Tương Tác -->
+        <button onclick="openCartModal()" class="relative p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+          <i class="fa-solid fa-cart-shopping text-base"></i>
+          <span id="cartCountBadge" class="absolute -top-1 -right-1 w-5 h-5 rounded-full dp-bg-red text-white text-[10px] font-black flex items-center justify-center shadow">
+            0
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Search Mobile -->
+    <div class="p-2.5 pt-0 md:hidden">
+      <div class="flex items-center rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-xs">
+        <i class="fa-solid fa-magnifying-glass text-slate-400 mr-2"></i>
+        <input 
+          type="text" 
+          id="searchInputMobile" 
+          oninput="handleSearch(this.value)" 
+          placeholder="Tìm kiếm đặc sản OCOP, sách cũ, gọi thợ 6K..." 
+          class="bg-transparent w-full focus:outline-none"
+        >
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= HERO BANNER & 3 TRỤ CỘT SÀN ================= -->
+  <section class="max-w-7xl mx-auto px-4 mt-4">
+    <div class="hero-gradient rounded-3xl p-5 md:p-8 text-white shadow-xl relative overflow-hidden">
+      <!-- Glow effect -->
+      <div class="absolute -right-20 -bottom-20 w-80 h-80 rounded-full bg-red-600/30 blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-20 -top-20 w-80 h-80 rounded-full bg-blue-400/20 blur-3xl pointer-events-none"></div>
+
+      <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        <!-- Left Banner Content -->
+        <div class="lg:col-span-8 space-y-3 md:space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold text-amber-300">
+            <span>🦅 Sàn Thương Mại Điện Tử Kín Kẽ OS™ Phú Yên</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="text-white text-[11px]">Trực tuyến 24/7</span>
+          </div>
+
+          <h1 class="text-2xl sm:text-3xl md:text-4xl font-black leading-tight tracking-tight">
+            Chợ Phiên Số Đất Phú • Gọi Thợ 6K <br class="hidden sm:block"/>
+            <span class="text-amber-400">& Thuê Chatbox AI Bán Hàng 199K</span>
+          </h1>
+
+          <p class="text-xs sm:text-sm text-slate-200 leading-relaxed max-w-2xl">
+            Sàn thương mại tích hợp 3 trong 1: Mua sắm <b>Đặc sản OCOP, Sách cũ, Xe cũ đã kiểm định</b>; Kết nối <b>Đội Thợ 6K có mặt trong 15 phút</b>; và <b>Cho thuê Trợ lý AI bán hàng tự động</b> chốt đơn VietQR về thẳng tài khoản chủ quán!
+          </p>
+
+          <div class="flex flex-wrap items-center gap-3 pt-2">
+            <button onclick="scrollToSection('catalogSection')" class="dp-bg-red hover:bg-red-700 text-white font-extrabold text-xs sm:text-sm px-5 py-3 rounded-2xl shadow-lg shadow-red-900/30 transition flex items-center gap-2">
+              <i class="fa-solid fa-basket-shopping"></i> Khám Phá Chợ Phiên
+            </button>
+            <a href="./zalo_ai_chat.html" class="bg-white/10 hover:bg-white/20 text-white border border-white/30 font-bold text-xs sm:text-sm px-5 py-3 rounded-2xl backdrop-blur-md transition flex items-center gap-2">
+              <i class="fa-solid fa-comments text-amber-300"></i> Trải Nghiệm Chatbot AI
+            </a>
+            <a href="./goi_tho_6k.html" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs sm:text-sm px-5 py-3 rounded-2xl shadow-lg transition flex items-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-bolt"></i> ⚡ Cứu Hộ / Gọi Thợ 6K (Trang Chuyên Biệt)
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Banner Metrics -->
+        <div class="lg:col-span-4 grid grid-cols-2 gap-3">
+          <div class="bg-white/10 backdrop-blur-md rounded-2xl p-3.5 border border-white/15">
+            <div class="text-amber-300 text-lg font-black"><i class="fa-solid fa-shield-halved"></i> 100% 6K</div>
+            <div class="text-[11px] font-bold text-slate-100 mt-0.5">Khóa Giá K3 • OTP K5</div>
+            <p class="text-[10px] text-slate-300 mt-1">Không phát sinh phụ phí, nghiệm thu mới thanh toán.</p>
+          </div>
+          <div class="bg-white/10 backdrop-blur-md rounded-2xl p-3.5 border border-white/15">
+            <div class="text-amber-300 text-lg font-black"><i class="fa-solid fa-qrcode"></i> VietQR</div>
+            <div class="text-[11px] font-bold text-slate-100 mt-0.5">Zero-Float Tức Thì</div>
+            <p class="text-[10px] text-slate-300 mt-1">Tiền về thẳng STK chủ tiệm, tự sinh QR thanh toán.</p>
+          </div>
+          <div class="bg-white/10 backdrop-blur-md rounded-2xl p-3.5 border border-white/15">
+            <div class="text-amber-300 text-lg font-black"><i class="fa-solid fa-truck-fast"></i> 15 - 30P</div>
+            <div class="text-[11px] font-bold text-slate-100 mt-0.5">Nội Thành Tuy Hòa</div>
+            <p class="text-[10px] text-slate-300 mt-1">Giao hỏa tốc hoặc gom chuyến huyện lân cận -35%.</p>
+          </div>
+          <div class="bg-white/10 backdrop-blur-md rounded-2xl p-3.5 border border-white/15">
+            <div class="text-amber-300 text-lg font-black"><i class="fa-solid fa-robot"></i> 199.000đ</div>
+            <div class="text-[11px] font-bold text-slate-100 mt-0.5">Thuê AI Bán Hàng/Tháng</div>
+            <p class="text-[10px] text-slate-300 mt-1">Trực Zalo, FB, Viber, Telegram đón khách cả đêm.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ĐIỀU HƯỚNG NHU CẦU CỨU HỘ & GỌI THỢ KỸ THUẬT (DEMAND NAVIGATION) ================= -->
+  <section class="max-w-7xl mx-auto px-4 mt-6">
+    <div class="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 rounded-3xl p-5 sm:p-6 border-2 dp-border-blue text-white shadow-xl space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span>
+            <span class="text-xs font-black uppercase text-amber-400 tracking-wide">ĐIỀU HƯỚNG NHU CẦU KHẨN CẤP 24/7</span>
+          </div>
+          <h2 class="text-base sm:text-lg font-black mt-0.5">Bạn Đang Cần Khắc Phục Sự Cố Gì Tại Phú Yên?</h2>
+          <p class="text-[11px] text-slate-300">Bấm chọn nhu cầu để tự động điền form và điều phối thợ kỹ thuật 6K có mặt sau 15–20 phút</p>
+        </div>
+        <a href="./goi_tho_6k.html" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs px-4 py-2 rounded-xl shadow flex items-center gap-1.5 transition shrink-0">
+          <i class="fa-solid fa-satellite-dish"></i> Mở Radar GPS Bản Đồ
+        </a>
+      </div>
+
+      <!-- 8 Icon Nhu Cầu Quick Access -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5 text-center">
+        <a href="./goi_tho_6k.html?demand=dienlanh" class="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-cyan-950/60 border border-slate-700 hover:border-cyan-400 transition flex flex-col items-center group">
+          <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-lg mb-1 group-hover:scale-110 transition">
+            <i class="fa-solid fa-snowflake"></i>
+          </div>
+          <span class="font-extrabold text-xs text-white group-hover:text-cyan-300">Điện Lạnh</span>
+          <span class="text-[9px] text-slate-400">Máy lạnh • Tủ lạnh</span>
+        </a>
+
+        <a href="./goi_tho_6k.html?demand=diennuoc" class="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-amber-950/60 border border-slate-700 hover:border-amber-400 transition flex flex-col items-center group">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg mb-1 group-hover:scale-110 transition">
+            <i class="fa-solid fa-bolt-lightning"></i>
+          </div>
+          <span class="font-extrabold text-xs text-white group-hover:text-amber-300">Sự Cố Điện</span>
+          <span class="text-[9px] text-slate-400">Chập điện • Phao bơm</span>
+        </a>
+
+        <a href="./goi_tho_6k.html?demand=thongnghet" class="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-blue-950/60 border border-slate-700 hover:border-blue-400 transition flex flex-col items-center group">
+          <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-lg mb-1 group-hover:scale-110 transition">
+            <i class="fa-solid fa-faucet-drip"></i>
+          </div>
+          <span class="font-extrabold text-xs text-white group-hover:text-blue-300">Cấp Thoát Nước</span>
+          <span class="text-[9px] text-slate-400">Nghẹt cống • Ống vỡ</span>
+        </a>
+
+        <a href="./goi_tho_6k.html?demand=xemay" class="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-red-950/60 border border-slate-700 hover:border-red-400 transition flex flex-col items-center group">
+          <div class="w-10 h-10 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center text-lg mb-1 group-hover:scale-110 transition">
+            <i class="fa-solid fa-motorcycle"></i>
+          </div>
+          <span class="font-extrabold text-xs text-white group-hover:text-red-300">Cứu Hộ Xe 78</span>
+          <span class="text-[9px] text-slate-400">Chết máy • Vá lưu động</span>
+        </a>
+
+        <a href="./goi_tho_6k.html?demand=khoacua" class="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-purple-950/60 border border-slate-700 hover:border-purple-400 transition flex flex-col items-center group">
+          <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-lg mb-1 group-hover:scale-110 transition">
+            <i class="fa-solid fa-key"></i>
+          </div>
+          <span class="font-extrabold text-xs text-white group-hover:text-purple-300">Khóa & Cửa</span>
+          <span class="text-[9px] text-slate-400">Kẹt khóa • Cửa xệ</span>
+        </a>
+
+        <a href="./goi_tho_6k.html?demand=maygiat" class="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-emerald-950/60 border border-slate-700 hover:border-emerald-400 transition flex flex-col items-center group">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg mb-1 group-hover:scale-110 transition">
+            <i class="fa-solid fa-soap"></i>
+          </div>
+          <span class="font-extrabold text-xs text-white group-hover:text-emerald-300">Máy Giặt</span>
+          <span class="text-[9px] text-slate-400">Vắt kêu • Bình nóng</span>
+        </a>
+
+        <a href="./goi_tho_6k.html?demand=suanha" class="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-orange-950/60 border border-slate-700 hover:border-orange-400 transition flex flex-col items-center group">
+          <div class="w-10 h-10 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center text-lg mb-1 group-hover:scale-110 transition">
+            <i class="fa-solid fa-trowel-bricks"></i>
+          </div>
+          <span class="font-extrabold text-xs text-white group-hover:text-orange-300">Sửa Nhà</span>
+          <span class="text-[9px] text-slate-400">Chống thấm • Gạch rộp</span>
+        </a>
+
+        <a href="./goi_tho_6k.html?demand=bocxep" class="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-pink-950/60 border border-slate-700 hover:border-pink-400 transition flex flex-col items-center group">
+          <div class="w-10 h-10 rounded-xl bg-pink-500/20 text-pink-400 flex items-center justify-center text-lg mb-1 group-hover:scale-110 transition">
+            <i class="fa-solid fa-dolly"></i>
+          </div>
+          <span class="font-extrabold text-xs text-white group-hover:text-pink-300">Bốc Xếp Trọ</span>
+          <span class="text-[9px] text-slate-400">Dọn tiệm • Xe ba gác</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 8 DANH MỤC NGÀNH HÀNG ĐẶC SẮC ================= -->
+  <section class="max-w-7xl mx-auto px-4 mt-6">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-base sm:text-lg font-extrabold dp-text-blue flex items-center gap-2">
+        <i class="fa-solid fa-layer-group dp-text-red"></i> Danh Mục Chợ Phiên Đất Phú
+      </h2>
+      <span class="text-xs text-slate-500">8 Chuyên ngành được kiểm định</span>
+    </div>
+
+    <div class="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-8 gap-2.5" id="categoryBar">
+      <!-- Rendered via JS -->
+    </div>
+  </section>
+
+  <!-- ================= GIAN HÀNG TIÊU BIỂU (SHOWROOM SỐ CỦA ĐẤT PHÚ) ================= -->
+  <section class="max-w-7xl mx-auto px-4 mt-8">
+    <div class="flex items-center justify-between mb-3.5">
+      <div>
+        <h2 class="text-base sm:text-lg font-extrabold dp-text-blue flex items-center gap-2">
+          <i class="fa-solid fa-store dp-text-red"></i> Hệ Thống Gian Hàng Xác Thực 6K
+        </h2>
+        <p class="text-xs text-slate-500">Mỗi cửa hàng đều có Trợ lý AI riêng và số tài khoản ngân hàng chính chủ</p>
+      </div>
+      <a href="./zalo_ai_chat.html" class="text-xs font-bold dp-text-blue hover:underline flex items-center gap-1">
+        Xem tất cả gian hàng <i class="fa-solid fa-angle-right"></i>
+      </a>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="shopGrid">
+      <!-- Rendered via JS -->
+    </div>
+  </section>
+
+  <!-- ================= KHU VỰC SẢN PHẨM & DỊCH VỤ SÀN (CHỢ PHIÊN) ================= -->
+  <section id="catalogSection" class="max-w-7xl mx-auto px-4 mt-9">
+    <!-- Bộ Lọc Nhanh Thông Minh -->
+    <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 mb-5">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div class="flex items-center gap-2 flex-wrap" id="filterPillsContainer">
+          <span class="text-xs font-bold text-slate-500 mr-1"><i class="fa-solid fa-filter"></i> Lọc theo:</span>
+          <button onclick="setFilterCategory('all')" id="pill-all" class="filter-pill active px-3 py-1.5 rounded-full text-xs font-bold transition dp-bg-blue text-white shadow-sm">
+            Tất Cả Sản Phẩm
+          </button>
+          <button onclick="setFilterCategory('ocop')" id="pill-ocop" class="filter-pill px-3 py-1.5 rounded-full text-xs font-bold transition bg-slate-100 hover:bg-slate-200 text-slate-700">
+            🥩 Đặc Sản OCOP
+          </button>
+          <button onclick="setFilterCategory('docu_sach')" id="pill-docu_sach" class="filter-pill px-3 py-1.5 rounded-full text-xs font-bold transition bg-slate-100 hover:bg-slate-200 text-slate-700">
+            📚 Sách Cũ & Đồ Cũ 6K
+          </button>
+          <button onclick="setFilterCategory('xecu')" id="pill-xecu" class="filter-pill px-3 py-1.5 rounded-full text-xs font-bold transition bg-slate-100 hover:bg-slate-200 text-slate-700">
+            🛵 Xe Máy Cũ Biển 78
+          </button>
+          <button onclick="setFilterCategory('suata')" id="pill-suata" class="filter-pill px-3 py-1.5 rounded-full text-xs font-bold transition bg-slate-100 hover:bg-slate-200 text-slate-700">
+            🍼 Sữa Tã Mẹ & Bé
+          </button>
+          <button onclick="setFilterCategory('chay')" id="pill-chay" class="filter-pill px-3 py-1.5 rounded-full text-xs font-bold transition bg-slate-100 hover:bg-slate-200 text-slate-700">
+            🪷 Ẩm Thực Chay
+          </button>
+          <button onclick="setFilterCategory('kythuat')" id="pill-kythuat" class="filter-pill px-3 py-1.5 rounded-full text-xs font-bold transition bg-slate-100 hover:bg-slate-200 text-slate-700">
+            🛠️ Kỹ Thuật 6K & AI
+          </button>
+          <button onclick="setFilterCategory('ketoan')" id="pill-ketoan" class="filter-pill px-3 py-1.5 rounded-full text-xs font-bold transition bg-slate-100 hover:bg-slate-200 text-slate-700">
+            🧾 Hóa Đơn & Kế Toán
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2 text-xs">
+          <span class="text-slate-500 font-semibold">Sắp xếp:</span>
+          <select id="sortSelect" onchange="applySorting(this.value)" class="bg-slate-50 border border-slate-300 rounded-xl px-2.5 py-1.5 font-bold dp-text-blue focus:outline-none">
+            <option value="featured">Nổi Bật / Bán Chạy</option>
+            <option value="price-asc">Giá: Thấp đến Cao</option>
+            <option value="price-desc">Giá: Cao đến Thấp</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5" id="productsMarketGrid">
+      <!-- Rendered via JS -->
+    </div>
+
+    <!-- Empty search result alert -->
+    <div id="emptyCatalogAlert" class="hidden text-center py-12 bg-white rounded-3xl border border-slate-200 mt-4">
+      <i class="fa-solid fa-magnifying-glass text-4xl text-slate-300 mb-2"></i>
+      <h3 class="font-bold text-slate-700">Không tìm thấy sản phẩm phù hợp</h3>
+      <p class="text-xs text-slate-400 mt-1">Vui lòng thử tìm với từ khóa khác hoặc bấm nút bên dưới.</p>
+      <button onclick="resetFilters()" class="mt-3 dp-bg-blue text-white text-xs font-bold px-4 py-2 rounded-xl">
+        Xem Tất Cả Sản Phẩm
+      </button>
+    </div>
+  </section>
+
+  <!-- ================= BANNER THUÊ CHATBOX AI 199K & GIA NHẬP SÀN ================= -->
+  <section class="max-w-7xl mx-auto px-4 mt-12 mb-6">
+    <div class="bg-gradient-to-r from-[#D32027] via-red-600 to-[#1B2A6B] rounded-3xl p-6 md:p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+      <div class="space-y-2 text-center md:text-left">
+        <span class="px-3 py-1 rounded-full bg-white/20 text-white text-xs font-extrabold uppercase">
+          Dành Cho Chủ Quán • Tiệm Bán Lẻ • Thợ Kỹ Thuật
+        </span>
+        <h3 class="text-xl sm:text-2xl font-black">
+          Mở Gian Hàng Số & Thuê Trợ Lý AI Chốt Đơn 24/7 (199K/Tháng)
+        </h3>
+        <p class="text-xs sm:text-sm text-slate-100 max-w-xl">
+          Tặng ngay bộ kịch bản chốt đơn tự động, kết nối trực tiếp vào Zalo/Facebook và hỗ trợ xuất mã VietQR không sợ thất thoát doanh số.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-center gap-3 shrink-0">
+        <a href="./bao_gia_chatbox_ai.html" class="bg-white hover:bg-slate-100 dp-text-red font-black text-xs sm:text-sm px-6 py-3.5 rounded-2xl shadow-lg transition">
+          <i class="fa-solid fa-receipt"></i> Xem Bảng Giá & Thuê Ngay
+        </a>
+        <a href="./bo_cong_cu_ban_hang_tuan1.html" class="bg-black/30 hover:bg-black/40 text-white font-bold text-xs sm:text-sm px-5 py-3.5 rounded-2xl border border-white/20 transition">
+          <i class="fa-solid fa-briefcase"></i> Bộ Công Cụ Bán Hàng
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FOOTER CHUẨN THƯƠNG MẠI & PHÁP LÝ ================= -->
+  <footer class="bg-white border-t border-slate-200 mt-auto pt-10 pb-8 text-slate-600 text-xs">
+    <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
+      <!-- Col 1: Về Đất Phú -->
+      <div class="space-y-3">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl dp-bg-red flex items-center justify-center text-white font-black text-sm">
+            DP
+          </div>
+          <span class="font-black text-base dp-text-blue">ĐẤT PHÚ ONEBASE</span>
+        </div>
+        <p class="text-slate-500 leading-relaxed text-[11px]">
+          Hệ sinh thái Sàn Thương Mại Điện Tử Chợ Phiên, Tổng Đài Điều Phối Kỹ Thuật 6K và Nền Tảng Trợ Lý Bán Hàng Kín Kẽ AI™ phục vụ bà con Phú Yên và kết nối toàn quốc.
+        </p>
+        <div class="text-[11px] font-semibold dp-text-blue">
+          Đại diện pháp luật: Giám đốc <b>Phạm Thanh Hân</b>
+        </div>
+      </div>
+
+      <!-- Col 2: Liên kết nhanh -->
+      <div class="space-y-2">
+        <div class="font-extrabold dp-text-blue text-sm uppercase">Dịch Vụ Nổi Bật</div>
+        <ul class="space-y-1.5 text-slate-500">
+          <li><a href="./zalo_ai_chat.html?shop=dacsan-chiba" class="hover:text-red-600">• Đặc Sản Xứ Nẫu Chị Ba</a></li>
+          <li><a href="./zalo_ai_chat.html?shop=docu-sachxe-6k" class="hover:text-red-600">• Chợ Sách Cũ & Đồ Cũ 6K</a></li>
+          <li><a href="./index.html#sectionDispatch" class="hover:text-red-600">• Tổng Đài Gọi Thợ Kỹ Thuật 6K</a></li>
+          <li><a href="./zalo_ai_chat.html?shop=ketoan-thue-datphu" class="hover:text-red-600">• Hóa Đơn Điện Tử & Kế Toán Thuế</a></li>
+          <li><a href="./bao_gia_chatbox_ai.html" class="hover:text-red-600">• Cho Thuê Chatbox AI Bán Hàng 199K</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Cam kết Kín Kẽ 6K -->
+      <div class="space-y-2">
+        <div class="font-extrabold dp-text-blue text-sm uppercase">Bảo Chứng Kín Kẽ 6K</div>
+        <ul class="space-y-1.5 text-slate-500 text-[11px]">
+          <li><span class="dp-text-red font-bold">K1:</span> Kết nối Zalo SDK & Định danh</li>
+          <li><span class="dp-text-red font-bold">K2:</span> Kiểm định kỹ thuật & Geostamp GPS</li>
+          <li><span class="dp-text-red font-bold">K3:</span> Khóa cứng giá niêm yết minh bạch</li>
+          <li><span class="dp-text-red font-bold">K4:</span> Kích hoạt thi công có đóng dấu ảnh</li>
+          <li><span class="dp-text-red font-bold">K5:</span> Nghiệm thu bằng mã OTP khách đọc</li>
+          <li><span class="dp-text-red font-bold">K6:</span> Bảo hành điện tử QR & Chia 95/5</li>
+        </ul>
+      </div>
+
+      <!-- Col 4: Liên hệ & Tài khoản -->
+      <div class="space-y-2 text-[11px]">
+        <div class="font-extrabold dp-text-blue text-sm uppercase">Hạ Tầng Backend Ổ E</div>
+        <div><b>HỆ THỐNG LƯU TRỮ VẬT LÝ Ổ E</b></div>
+        <div>• Thư mục CSDL: <code class="bg-slate-100 p-1 rounded font-mono">E:\datphu-onebase\data\db\</code></div>
+        <div>• File Storage: <code class="bg-slate-100 p-1 rounded font-mono">E:\datphu-onebase\data\storage\</code></div>
+        <div>• Cổng Realtime SSE: <b class="font-mono text-emerald-700">http://localhost:3456/api/realtime</b></div>
+        <div>• Quản lý tài khoản: <b>RBAC (Admin, Merchant, Worker, Customer)</b></div>
+        <div>Hotline kỹ thuật: <b>0935.889.900</b></div>
+      </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 mt-8 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-400 gap-2">
+      <div>© 2026 CÔNG TY TNHH THƯƠNG MẠI ĐẤT PHÚ. Bảo lưu mọi bản quyền Kín Kẽ OS™.</div>
+      <div class="flex items-center gap-3">
+        <span>Chính Sách Bảo Mật</span>
+        <span>•</span>
+        <span>Quy Chế Hoạt Động Sàn</span>
+        <span>•</span>
+        <span>Nghị định 398/2026/NĐ-CP</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= BOTTOM NAV CHO THIẾT BỊ DI ĐỘNG ================= -->
+  <div class="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 z-50 px-3 py-2 flex items-center justify-around shadow-lg">
+    <a href="./ecommerce_marketplace.html" class="flex flex-col items-center gap-0.5 dp-text-red">
+      <i class="fa-solid fa-house text-base"></i>
+      <span class="text-[10px] font-bold">Trang Chủ</span>
+    </a>
+    <a href="#catalogSection" class="flex flex-col items-center gap-0.5 text-slate-500 hover:text-red-600">
+      <i class="fa-solid fa-basket-shopping text-base"></i>
+      <span class="text-[10px] font-bold">Chợ Phiên</span>
+    </a>
+    <a href="./zalo_ai_chat.html" class="flex flex-col items-center gap-0.5 text-slate-500 hover:text-red-600">
+      <i class="fa-solid fa-robot text-base"></i>
+      <span class="text-[10px] font-bold">AI Chat</span>
+    </a>
+    <button onclick="openWorkerDispatchModal()" class="flex flex-col items-center gap-0.5 text-slate-500 hover:text-red-600 cursor-pointer">
+      <i class="fa-solid fa-wrench text-base"></i>
+      <span class="text-[10px] font-bold">Gọi Thợ</span>
+    </button>
+    <button onclick="openCartModal()" class="flex flex-col items-center gap-0.5 text-slate-500 relative">
+      <i class="fa-solid fa-cart-shopping text-base"></i>
+      <span class="text-[10px] font-bold">Giỏ Hàng</span>
+      <span id="cartCountBadgeMobile" class="absolute -top-1 -right-1 w-4 h-4 rounded-full dp-bg-red text-white text-[9px] font-bold flex items-center justify-center">0</span>
+    </button>
+  </div>
+
+  <!-- ================= MODAL GIỎ HÀNG & THANH TOÁN VIETQR ================= -->
+  <div id="cartModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-3xl max-w-xl w-full max-h-[90vh] flex flex-col shadow-2xl border-2 dp-border-blue overflow-hidden">
+      <!-- Cart Header -->
+      <div class="dp-bg-blue text-white p-4 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-cart-shopping text-lg text-amber-300"></i>
+          <div>
+            <h3 class="font-extrabold text-sm sm:text-base">Giỏ Hàng Sàn Đất Phú OneBase</h3>
+            <span class="text-[10px] text-slate-300">Xuất hóa đơn & thanh toán VietQR tự động</span>
+          </div>
+        </div>
+        <button onclick="closeCartModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-sm">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Cart Items Body -->
+      <div class="p-4 overflow-y-auto flex-1 custom-scroll space-y-3" id="cartItemsList">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- Cart Footer & Checkout -->
+      <div class="p-4 bg-slate-50 border-t border-slate-200 space-y-3">
+        <!-- Input Phone & Address -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+          <div>
+            <label class="font-bold dp-text-blue block mb-1">Số điện thoại nhận hàng *</label>
+            <input type="tel" id="checkoutPhone" placeholder="VD: 0914.882.341" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 font-mono font-bold">
+          </div>
+          <div>
+            <label class="font-bold dp-text-blue block mb-1">Địa chỉ giao hàng (Tuy Hòa/Phú Yên) *</label>
+            <input type="text" id="checkoutAddress" placeholder="VD: 12 Nguyễn Huệ, P.5, Tuy Hòa" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 font-medium">
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-1">
+          <div>
+            <div class="text-[11px] text-slate-500 font-semibold">Tổng thanh toán (VietQR):</div>
+            <div id="cartTotalMoney" class="text-xl font-black dp-text-red">0đ</div>
+          </div>
+          <button onclick="processCheckoutVietQr()" class="dp-bg-red hover:bg-red-700 text-white font-extrabold px-6 py-3 rounded-2xl shadow-lg shadow-red-500/30 text-xs sm:text-sm flex items-center gap-2">
+            <i class="fa-solid fa-qrcode"></i> Tạo Mã VietQR Thanh Toán
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL HIỂN THỊ VIETQR HOÀN TẤT ĐƠN ================= -->
+  <div id="vietQrModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-5 text-center shadow-2xl border-4 dp-border-blue space-y-3">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+        <span class="text-xs font-black dp-text-blue uppercase">MÃ VIETQR CHÍNH CHỦ ĐẤT PHÚ</span>
+        <button onclick="closeVietQrModal()" class="text-slate-400 hover:text-slate-600 text-sm">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <h4 id="qrOrderTitle" class="font-bold text-sm dp-text-blue">Đơn Hàng: DP8890</h4>
+      <p class="text-[11px] text-slate-500">Mở ứng dụng Ngân hàng quét mã VietQR để thanh toán tức thì</p>
+
+      <div class="py-2 flex justify-center">
+        <img id="qrCheckoutImg" src="" alt="Mã VietQR" class="w-52 h-52 rounded-2xl border-2 dp-border-red p-2 shadow-sm">
+      </div>
+
+      <div class="bg-slate-50 rounded-xl p-2.5 text-xs text-left space-y-1 border border-slate-200">
+        <div>• Ngân hàng: <b>Vietcombank (VCB)</b></div>
+        <div>• Số tài khoản: <b class="font-mono text-sm dp-text-red">0751000025858</b></div>
+        <div>• Chủ tài khoản: <b>CONG TY TNHH THUONG MAI DAT PHU</b></div>
+        <div>• Số tiền: <b id="qrModalAmount" class="dp-text-red font-black">0đ</b></div>
+      </div>
+
+      <button onclick="confirmOrderSuccess()" class="w-full dp-bg-blue hover:bg-blue-900 text-white font-extrabold text-xs py-3 rounded-xl shadow">
+        ✅ Đã Chuyển Khoản Thành Công
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= MODAL AUTHENTICATION (ĐĂNG NHẬP / ĐĂNG KÝ) ================= -->
+  <div id="authModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border-4 dp-border-blue space-y-4">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+        <h4 id="authModalTitle" class="font-extrabold text-base dp-text-blue">🔐 Đăng Nhập Hệ Thống</h4>
+        <button onclick="closeAuthModal()" class="text-slate-400 hover:text-slate-600 text-sm">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="font-bold dp-text-blue block mb-1">Số điện thoại *</label>
+          <input type="tel" id="authPhone" value="0935889900" placeholder="0935..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-mono font-bold">
+        </div>
+        <div>
+          <label class="font-bold dp-text-blue block mb-1">Mật khẩu *</label>
+          <input type="password" id="authPassword" value="Datphu@2026" placeholder="••••••••" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-mono">
+        </div>
+        <div id="authRegisterExtraFields" class="hidden space-y-3">
+          <div>
+            <label class="font-bold dp-text-blue block mb-1">Họ và tên *</label>
+            <input type="text" id="authFullName" placeholder="VD: Phạm Thanh Hân" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-semibold">
+          </div>
+          <div>
+            <label class="font-bold dp-text-blue block mb-1">Vai trò phân quyền (RBAC) *</label>
+            <select id="authRole" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-bold dp-text-blue">
+              <option value="customer">🛍️ Khách Hàng Sàn</option>
+              <option value="merchant">🏪 Chủ Gian Hàng / Thuê Bot</option>
+              <option value="worker">🛠️ Thợ Kỹ Thuật 6K</option>
+              <option value="admin">👑 Quản Trị Viên (Admin)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-2 pt-2">
+        <button id="authSubmitBtn" onclick="handleAuthSubmit()" class="w-full dp-bg-red hover:bg-red-700 text-white font-extrabold text-xs py-3 rounded-xl shadow">
+          Đăng Nhập Ngay
+        </button>
+        <button id="authToggleModeBtn" onclick="toggleAuthMode()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs py-2 rounded-xl">
+          Chưa có tài khoản? Đăng ký mới
+        </button>
+      </div>
+
+      <div class="text-[10px] text-slate-400 text-center">
+        Dữ liệu tài khoản lưu trữ bảo mật tại <code class="font-mono">E:\datphu-onebase\data\db\users.json</code>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL FILE STORAGE (UPLOAD FILE / ẢNH GEOSTAMP LÊN Ổ E) ================= -->
+  <div id="storageModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border-4 dp-border-blue space-y-4">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+        <h4 class="font-extrabold text-base dp-text-blue">📁 File Storage Ổ E (Upload Ảnh / Tài Liệu)</h4>
+        <button onclick="closeStorageModal()" class="text-slate-400 hover:text-slate-600 text-sm">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <p class="text-xs text-slate-600 leading-relaxed">
+        Tải ảnh chụp hiện trường Geostamp K4, hợp đồng, biên bản nghiệm thu hoặc hóa đơn chứng từ. File được lưu vật lý trực tiếp tại <code class="font-mono bg-slate-100 px-1 py-0.5 rounded">E:\datphu-onebase\data\storage\</code>!
+      </p>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="font-bold dp-text-blue block mb-1">Loại thư mục lưu trữ:</label>
+          <select id="uploadTargetFolder" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-bold dp-text-blue">
+            <option value="image">📸 Hình ảnh (storage/images)</option>
+            <option value="document">📄 Tài liệu / PDF / Hóa đơn (storage/documents)</option>
+          </select>
+        </div>
+
+        <div class="border-2 border-dashed border-slate-300 rounded-2xl p-4 text-center bg-slate-50 hover:bg-blue-50/50 transition cursor-pointer" onclick="document.getElementById('storageFileInput').click()">
+          <input type="file" id="storageFileInput" onchange="previewUploadFile(event)" class="hidden">
+          <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-400 mb-1"></i>
+          <div class="font-bold text-slate-700">Bấm chọn tệp từ máy tính</div>
+          <div id="storageFileLabel" class="text-[11px] text-slate-400 mt-0.5">Hỗ trợ JPG, PNG, PDF, TXT...</div>
+        </div>
+
+        <div id="storagePreviewBox" class="hidden p-2 rounded-xl bg-white border border-slate-200 flex items-center gap-3">
+          <img id="storagePreviewImg" src="" class="w-12 h-12 object-cover rounded-lg border border-slate-200">
+          <div class="flex-1 min-w-0">
+            <div id="storagePreviewName" class="font-bold text-xs truncate">ten_file.jpg</div>
+            <div id="storagePreviewSize" class="text-[10px] text-slate-400">0 KB</div>
+          </div>
+        </div>
+      </div>
+
+      <button id="btnExecuteUpload" onclick="executeUploadFile()" class="w-full dp-bg-red hover:bg-red-700 text-white font-extrabold text-xs py-3 rounded-xl shadow">
+        🚀 Tiến Hành Tải Lên Ổ E
+      </button>
+
+      <div id="uploadResultAlert" class="hidden text-xs p-3 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold leading-relaxed"></div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL ĐIỀU PHỐI GỌI THỢ 6K & CỨU HỘ KHẨN CẤP 24/7 ================= -->
+  <div id="workerDispatchModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl border-4 dp-border-blue overflow-hidden">
+      <!-- Modal Header -->
+      <div class="dp-bg-blue text-white p-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center text-lg font-black shadow">
+            <i class="fa-solid fa-bolt"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="font-extrabold text-base">Tổng Đài Điều Phối Thợ Kỹ Thuật 6K</h3>
+              <span class="text-[9px] font-black uppercase bg-red-600 text-white px-2 py-0.5 rounded-full animate-pulse">Có mặt 15P</span>
+            </div>
+            <p class="text-[11px] text-slate-300">Khóa giá K3 • Nghiệm thu OTP 4 số K5 • Chia tự động 95% Thợ / 5% Sàn</p>
+          </div>
+        </div>
+        <button onclick="closeWorkerDispatchModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-sm">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body (Custom Scroll) -->
+      <div class="p-4 sm:p-5 overflow-y-auto custom-scroll space-y-4 text-xs">
+        
+        <!-- Banner Radar Thợ Trực Ca -->
+        <div class="p-3.5 rounded-2xl bg-gradient-to-r from-blue-50 via-slate-50 to-red-50 border border-blue-200 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5">
+            <span class="w-3 h-3 rounded-full bg-emerald-500 animate-ping"></span>
+            <div>
+              <div class="font-extrabold dp-text-blue text-xs">Radar Quét Thợ Bản Kính 10Km (PostGIS & OpenStreetMap Live)</div>
+              <div class="text-[11px] text-slate-500">Đang có <b class="text-emerald-700">5 Thợ kỹ thuật sẵn sàng nhận ca</b> tại Tuy Hòa, Phú Hòa, Đông Hòa</div>
+            </div>
+          </div>
+          <a href="./goi_tho_6k.html" class="text-[11px] bg-amber-400 hover:bg-amber-300 text-slate-950 font-black px-3.5 py-1.5 rounded-xl border border-amber-500 shadow flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-satellite-dish text-red-600 animate-pulse"></i> Mở Radar GPS Bản Đồ Động
+          </a>
+        </div>
+
+        <!-- Chọn Dịch Vụ Kỹ Thuật Niêm Yết K3 -->
+        <div>
+          <label class="font-extrabold dp-text-blue block mb-1.5 text-xs">1. Chọn Hạng Mục Dịch Vụ Cần Thợ Đến Ngay (Khóa Giá K3):</label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" id="serviceSelectGrid">
+            <label class="p-3 rounded-xl border-2 border-red-500 bg-red-50/40 flex items-center justify-between cursor-pointer">
+              <div class="flex items-center gap-2.5">
+                <input type="radio" name="quickService" value="Tháo lắp máy lạnh 1 bộ|500000" checked class="text-red-600">
+                <div>
+                  <div class="font-bold dp-text-blue text-xs">❄️ Tháo Lắp Máy Lạnh Inverter</div>
+                  <div class="text-[10px] text-slate-500">Hút chân không + Đo gas đồng hồ chuẩn</div>
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="font-black dp-text-red text-xs">500.000đ</div>
+                <div class="text-[9px] text-slate-400">Niêm yết cứng</div>
+              </div>
+            </label>
+
+            <label class="p-3 rounded-xl border border-slate-200 hover:border-blue-400 bg-slate-50 flex items-center justify-between cursor-pointer">
+              <div class="flex items-center gap-2.5">
+                <input type="radio" name="quickService" value="Sửa chập điện / thay phao tự động|350000" class="text-red-600">
+                <div>
+                  <div class="font-bold dp-text-blue text-xs">⚡ Sửa Chập Điện / Phao Tự Động</div>
+                  <div class="text-[10px] text-slate-500">Chống cháy máy bơm, đo ampe an toàn</div>
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="font-black dp-text-red text-xs">350.000đ</div>
+                <div class="text-[9px] text-slate-400">Niêm yết cứng</div>
+              </div>
+            </label>
+
+            <label class="p-3 rounded-xl border border-slate-200 hover:border-blue-400 bg-slate-50 flex items-center justify-between cursor-pointer">
+              <div class="flex items-center gap-2.5">
+                <input type="radio" name="quickService" value="Thông nghẹt đường ống nước / vòi rò rỉ|250000" class="text-red-600">
+                <div>
+                  <div class="font-bold dp-text-blue text-xs">🚰 Thông Nghẹt / Sửa Đường Nước</div>
+                  <div class="text-[10px] text-slate-500">Máy lò xo chuyên dụng, không đục phá</div>
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="font-black dp-text-red text-xs">250.000đ</div>
+                <div class="text-[9px] text-slate-400">Niêm yết cứng</div>
+              </div>
+            </label>
+
+            <label class="p-3 rounded-xl border border-slate-200 hover:border-blue-400 bg-slate-50 flex items-center justify-between cursor-pointer">
+              <div class="flex items-center gap-2.5">
+                <input type="radio" name="quickService" value="Kiểm định xe máy cũ / đồ điện tử cũ|200000" class="text-red-600">
+                <div>
+                  <div class="font-bold dp-text-blue text-xs">🛵 Kiểm Định Xe Máy / Đồ Cũ 6K</div>
+                  <div class="text-[10px] text-slate-500">18 hạng mục, đo nén buồng đốt</div>
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="font-black dp-text-red text-xs">200.000đ</div>
+                <div class="text-[9px] text-slate-400">Niêm yết cứng</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Form Điền Thông Tin Khách Hàng -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+          <div>
+            <label class="font-bold dp-text-blue block mb-1">Số điện thoại liên hệ *</label>
+            <input type="tel" id="workerCustomerPhone" value="0914.882.341" placeholder="Nhập SĐT của bạn..." class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 font-mono font-bold">
+          </div>
+          <div>
+            <label class="font-bold dp-text-blue block mb-1">Địa chỉ cần thợ tới gấp (Tuy Hòa/Phú Yên) *</label>
+            <input type="text" id="workerCustomerAddress" value="Số 12 Nguyễn Huệ, P.5, TP. Tuy Hòa" placeholder="Số nhà, tên đường, phường/xã..." class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 font-medium">
+          </div>
+        </div>
+
+        <!-- Danh sách Thợ Nòng Cốt Đang Trực Ca -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label class="font-extrabold dp-text-blue text-xs">2. Thợ Kỹ Thuật Đang Trực Sẵn Tiếp Nhận Đơn (Dữ liệu Live Ổ E & Supabase):</label>
+            <span class="text-[10px] text-emerald-700 font-bold">★ Đạt chuẩn 6K</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" id="modalLiveWorkersList">
+            <!-- Render via JS -->
+          </div>
+        </div>
+
+        <!-- Mô phỏng 6K: Nghiệm thu OTP 4 số & Giải ngân 95/5 -->
+        <div class="p-3.5 rounded-2xl bg-amber-50 border-2 border-amber-300 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="font-black text-amber-900 text-xs">🔐 Quy Trình Nghiệm Thu K5 (Mã OTP 4 Số):</span>
+            <span class="text-[10px] dp-bg-blue text-white px-2 py-0.5 rounded font-bold">Bảo chứng Kín Kẽ</span>
+          </div>
+          <p class="text-[11px] text-amber-950 leading-relaxed">
+            Thợ đến làm xong, khách kiểm tra máy chạy tốt và <b>đọc mã OTP 4 số (VD: 6821)</b> thì hệ thống mới giải ngân tiền về ví thợ (95%) và cấp Phiếu bảo hành điện tử QR (K6). Tuyệt đối không lo chặt chém!
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3">
+        <button onclick="closeWorkerDispatchModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2.5 rounded-xl text-xs">
+          Đóng
+        </button>
+        <button onclick="submitWorkerDispatchRequest()" class="dp-bg-red hover:bg-red-700 text-white font-extrabold px-6 py-2.5 rounded-xl shadow-lg shadow-red-500/30 text-xs sm:text-sm flex items-center gap-2">
+          <i class="fa-solid fa-paper-plane"></i> Phát Lệnh Điều Phối Thợ 6K Ngay
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= JAVASCRIPT LOGIC SÀN THƯƠNG MẠI ================= -->
+  <script>
+    // 1. DỮ LIỆU CÁC GIAN HÀNG THUỘC SÀN ĐẤT PHÚ ONEBASE
+    const shopsData = [
+      {
+        id: "dacsan-chiba",
+        name: "Đặc Sản Xứ Nẫu Chị Ba",
+        tag: "OCOP Phú Yên",
+        avatar: "CB",
+        avatarBg: "#D32027",
+        desc: "Bò một nắng Krông Pa, Muối kiến vàng, Rượu cá ngựa, Yến sào Tuy Hòa",
+        rating: 4.9,
+        orders: 1420,
+        address: "Ngô Gia Tự, P. Phú Yên, TP. Tuy Hòa"
+      },
+      {
+        id: "docu-sachxe-6k",
+        name: "Chợ Sách Cũ • Đồ Cũ • Xe Cũ 6K",
+        tag: "Kiểm định 6K",
+        avatar: "6K",
+        avatarBg: "#1B2A6B",
+        desc: "Sách sưu tầm theo lô, Xe máy cũ biển 78 chính chủ, Máy giặt Inverter",
+        rating: 4.8,
+        orders: 890,
+        address: "Nguyễn Huệ, P.5, TP. Tuy Hòa"
+      },
+      {
+        id: "datphu-kythuat",
+        name: "Đất Phú: Kỹ Thuật 6K & AI",
+        tag: "Gọi thợ & Phần mềm",
+        avatar: "KT",
+        avatarBg: "#1B2A6B",
+        desc: "Tháo lắp máy lạnh, phao điện tự động, cho thuê Chatbox AI bán hàng 199K",
+        rating: 5.0,
+        orders: 2150,
+        address: "Trụ sở Đất Phú, TP. Tuy Hòa"
+      },
+      {
+        id: "sieuthi-namtien",
+        name: "Siêu Thị Sữa Tã Năm Tiền",
+        tag: "Mẹ & Bé",
+        avatar: "NT",
+        avatarBg: "#059669",
+        desc: "Sữa Meiji nội địa Nhật, Tã Moony Natural, Vitamin & đồ dùng sơ sinh",
+        rating: 4.9,
+        orders: 3100,
+        address: "Đại lộ Hùng Vương, TP. Tuy Hòa"
+      },
+      {
+        id: "bepchay-tamduc",
+        name: "Bếp Chay Thanh Tịnh Tâm Đức",
+        tag: "Ẩm thực chay",
+        avatar: "TĐ",
+        avatarBg: "#D97706",
+        desc: "Mâm cỗ chay 8 món, Cơm sen dưỡng sinh, Nước lẩu nấm thượng hạng",
+        rating: 4.9,
+        orders: 760,
+        address: "Lê Trung Kiên, P.1, TP. Tuy Hòa"
+      },
+      {
+        id: "ketoan-thue-datphu",
+        name: "Kế Toán • Thuế • Hóa Đơn Đất Phú",
+        tag: "Pháp lý & Thuế",
+        avatar: "HD",
+        avatarBg: "#7C3AED",
+        desc: "Chữ ký số FastCA, Hóa đơn máy tính tiền TT78, Kế toán thuế NĐ 398",
+        rating: 5.0,
+        orders: 540,
+        address: "Văn phòng Kế toán Đất Phú"
+      },
+      {
+        id: "shop-dienlanh-tuyhoa",
+        name: "Trung Tâm Điện Lạnh & Điều Hòa Đất Phú",
+        tag: "Tổng kho điện lạnh 6K",
+        avatar: "ĐL",
+        avatarBg: "#0284C7",
+        desc: "Tổng đại lý ống đồng Thái Lan, gas R32 Daikin, bo mạch biến tần Inverter, điều hòa kiểm định 6K",
+        rating: 4.9,
+        orders: 1650,
+        address: "Số 18 Ngô Gia Tự, P. Phú Yên, TP. Tuy Hòa"
+      },
+      {
+        id: "shop-phuyen-electric",
+        name: "Tổng Kho Thiết Bị Điện Nước Phú Yên",
+        tag: "Điện cơ & Tự động hóa",
+        avatar: "ĐN",
+        avatarBg: "#D97706",
+        desc: "Aptomat chống giật Panasonic, dây điện Cadivi chính hãng, phao điện an toàn 12V chống tràn",
+        rating: 5.0,
+        orders: 2210,
+        address: "Số 146 Ngô Gia Tự, TP. Tuy Hòa"
+      },
+      {
+        id: "shop-capthoatnuoc-phuyen",
+        name: "Kho Phụ Tùng Máy Bơm & Van Nước Tiền Phong",
+        tag: "Cấp thoát nước",
+        avatar: "TN",
+        avatarBg: "#2563EB",
+        desc: "Máy bơm tăng áp thông minh, van đồng Miha, ống nhựa uPVC/PPR Tiền Phong, phụ kiện thông cống",
+        rating: 4.9,
+        orders: 1120,
+        address: "Quốc lộ 25, Hòa Thắng, Phú Hòa"
+      },
+      {
+        id: "shop-nhomkinh-phuyen",
+        name: "Xưởng Nhôm Kính & Khóa An Toàn KinLong",
+        tag: "Cửa & Khóa thông minh",
+        avatar: "NK",
+        avatarBg: "#7C3AED",
+        desc: "Khóa vân tay Kaadas chống cắt, phụ kiện cửa nhôm Xingfa KinLong, bản lề thủy lực sàn chính hãng",
+        rating: 4.8,
+        orders: 840,
+        address: "Đường Nguyễn Hữu Thọ, Bình Kiến, TP. Tuy Hòa"
+      },
+      {
+        id: "shop-vlxd-tuyhoa",
+        name: "Tổng Kho Gạch Ốp Lát & Sơn Chống Thấm Tuy Hòa",
+        tag: "Vật liệu xây dựng",
+        avatar: "VL",
+        avatarBg: "#EA580C",
+        desc: "Sơn chống thấm Kova CT-11A, keo dán gạch Weber, gạch granite 60x60 Viglacera, chống dột mái tôn",
+        rating: 4.9,
+        orders: 1390,
+        address: "Đường Lê Thành Phương, P.8, TP. Tuy Hòa"
+      },
+      {
+        id: "shop-giadung-bep-tuyhoa",
+        name: "Trạm Linh Kiện Gia Dụng & Bếp Từ Tuy Hòa",
+        tag: "Linh kiện thiết bị bếp",
+        avatar: "GD",
+        avatarBg: "#059669",
+        desc: "Mâm từ bếp đôi, rơ-le bình nóng lạnh Ariston, van cấp nước máy giặt Electrolux/Toshiba/LG",
+        rating: 4.9,
+        orders: 970,
+        address: "Đường Trần Hưng Đạo, P.4, TP. Tuy Hòa"
+      }
+    ];
+
+    // 2. DỮ LIỆU SẢN PHẨM & DỊCH VỤ NIÊM YẾT CHÍNH THỨC
+    const productsData = [
+      {
+        id: 101,
+        shopId: "dacsan-chiba",
+        category: "ocop",
+        name: "Combo Bò Một Nắng Krông Pa (1Kg + Tặng Muối Kiến Vàng)",
+        price: 550000,
+        originalPrice: 620000,
+        image: "🥩",
+        badge: "Bán chạy #1",
+        promo: "Freeship Tuy Hòa • Đóng gói hút chân không",
+        desc: "Thịt bò cỏ tơ Krông Pa sấy nhiệt than hồng, tặng kèm hũ muối kiến vàng rừng chuẩn vị."
+      },
+      {
+        id: 102,
+        shopId: "dacsan-chiba",
+        category: "ocop",
+        name: "Cá Bống Sông Ba Kho Tiêu Sọ (Hũ 500g)",
+        price: 180000,
+        originalPrice: 210000,
+        image: "🐟",
+        badge: "OCOP 4 Sao",
+        promo: "Mua 2 hũ giảm 10%",
+        desc: "Cá bống cát tự nhiên bắt tại chân đập Đồng Cam, kho tiêu sọ thơm cay đậm đà."
+      },
+      {
+        id: 103,
+        shopId: "dacsan-chiba",
+        category: "ocop",
+        name: "Rượu Cá Ngựa Biển Phú Yên (Bình Thủy Tinh 500ml)",
+        price: 450000,
+        originalPrice: 500000,
+        image: "🍶",
+        badge: "Quà biếu",
+        promo: "Tặng hộp quà sang trọng",
+        desc: "Ngâm cùng hải mã thiên nhiên và thảo dược quý, bồi bổ sức khỏe cho gia đình."
+      },
+      {
+        id: 201,
+        shopId: "docu-sachxe-6k",
+        category: "docu_sach",
+        name: "Lô Sách Cũ Tinh Hoa & Truyện Xưa (Thùng 10Kg)",
+        price: 480000,
+        originalPrice: 650000,
+        image: "📚",
+        badge: "Bán Buôn/Lô",
+        promo: "Giảm 35% cho quán cafe & tiệm sách",
+        desc: "Sách văn học, lịch sử, kinh tế, truyện xưa còn đủ trang 90-95%, đã bọc plastic sạch đẹp."
+      },
+      {
+        id: 202,
+        shopId: "docu-sachxe-6k",
+        category: "docu_sach",
+        name: "Máy Giặt Toshiba Inverter 8.5Kg (Đã Kiểm Định Thợ 6K)",
+        price: 2650000,
+        originalPrice: 3200000,
+        image: "🧺",
+        badge: "Kiểm định 6K",
+        promo: "Bảo hành QR 6 tháng + Lắp đặt miễn phí",
+        desc: "Động cơ truyền động trực tiếp siêu êm, tiết kiệm điện nước, chụp ảnh Geostamp nguyên bản 100%."
+      },
+      {
+        id: 203,
+        shopId: "docu-sachxe-6k",
+        category: "xecu",
+        name: "Xe Máy Honda Wave Alpha Biển 78 (Máy Zin Chính Chủ)",
+        price: 8900000,
+        originalPrice: 9800000,
+        image: "🛵",
+        badge: "Xe Biển 78",
+        promo: "Bảo hành động cơ 6 tháng • Hỗ trợ sang tên",
+        desc: "Xe chính chủ tại Tuy Hòa, thợ máy 6K đã kiểm tra 18 hạng mục, máy nổ êm ru tiết kiệm xăng."
+      },
+      {
+        id: 204,
+        shopId: "docu-sachxe-6k",
+        category: "xecu",
+        name: "Xe Tay Ga Honda Vision Biển Phú Yên (Màu Đỏ Đô)",
+        price: 18500000,
+        originalPrice: 21000000,
+        image: "🛵",
+        badge: "Xe Lướt 6K",
+        promo: "Tặng mũ bảo hiểm 6K + Bảo dưỡng 1 năm",
+        desc: "Động cơ eSP 110cc nguyên zin, khóa Smartkey thông minh, sơn đẹp 95%."
+      },
+      {
+        id: 301,
+        shopId: "datphu-kythuat",
+        category: "kythuat",
+        name: "Gói Tháo Lắp Máy Lạnh 1 Bộ (Khóa Giá K3 Minh Bạch)",
+        price: 500000,
+        originalPrice: 600000,
+        image: "❄️",
+        badge: "Cứu hộ 15P",
+        promo: "Nghiệm thu OTP K5 mới thanh toán",
+        desc: "Bao gồm công tháo 200K + công lắp 300K, hút chân không và đo áp suất gas bằng đồng hồ chuẩn."
+      },
+      {
+        id: 302,
+        shopId: "datphu-kythuat",
+        category: "kythuat",
+        name: "Thuê Chatbox AI Bán Hàng Zalo/Facebook (1 Tháng)",
+        price: 199000,
+        originalPrice: 350000,
+        image: "🤖",
+        badge: "SaaS AI 199K",
+        promo: "Chỉ 6.000đ/ngày • Cài đặt trong 15 phút",
+        desc: "Trực chat chốt đơn 24/7 trên Zalo, Fanpage, Telegram; tự tạo VietQR tiền về thẳng STK chủ tiệm."
+      },
+      {
+        id: 303,
+        shopId: "datphu-kythuat",
+        category: "kythuat",
+        name: "Hệ Thống Phao Điện Tự Động Chống Cháy Bơm (Trọn Gói)",
+        price: 1650000,
+        originalPrice: 1950000,
+        image: "⚡",
+        badge: "Tự động hóa",
+        promo: "Bảo hành 12 tháng tận nơi",
+        desc: "Điện áp an toàn 12V chống giật tuyệt đối, tự ngắt khi cạn nước hoặc tràn bồn ngầm."
+      },
+      {
+        id: 401,
+        shopId: "sieuthi-namtien",
+        category: "suata",
+        name: "Sữa Meiji Số 9 Nội Địa Nhật (Lon 800g Cho Bé 1-3 Tuổi)",
+        price: 495000,
+        originalPrice: 535000,
+        image: "🍼",
+        badge: "Chính Hãng",
+        promo: "Giao nhanh 15 phút tại Tuy Hòa",
+        desc: "Hàng nội địa Nhật nguyên đai nguyên kiện, giàu DHA, ARA và canxi phát triển chiều cao."
+      },
+      {
+        id: 402,
+        shopId: "sieuthi-namtien",
+        category: "suata",
+        name: "Tã Quần Moony Natural Size L (Gói 36 Miếng Bông Organic)",
+        price: 385000,
+        originalPrice: 420000,
+        image: "🧷",
+        badge: "Bán chạy",
+        promo: "Mua 2 bịch tặng khăn ướt cao cấp",
+        desc: "Bề mặt bông hữu cơ 100% tự nhiên không gây kích ứng da, thiết kế chống tràn lưng 3D."
+      },
+      {
+        id: 501,
+        shopId: "bepchay-tamduc",
+        category: "chay",
+        name: "Mâm Cỗ Chay Thanh Tịnh 8 Món (Đầy Đủ Cơm Canh Cúng Giỗ)",
+        price: 850000,
+        originalPrice: 950000,
+        image: "🪷",
+        badge: "Đặt Tiệc",
+        promo: "Hỗ trợ cho mượn bát đĩa tận nhà",
+        desc: "Gồm gà chay hấp lá chanh, chả giò nấm sen, sườn non sốt chua ngọt, canh kiểm ngũ sắc, cơm hạt sen..."
+      },
+      {
+        id: 601,
+        shopId: "ketoan-thue-datphu",
+        category: "ketoan",
+        name: "Chữ Ký Số FastCA 3 Năm + 500 Hóa Đơn Điện Tử TT78",
+        price: 1490000,
+        originalPrice: 2200000,
+        image: "📜",
+        badge: "Combo DN/HTX",
+        promo: "Kích hoạt từ xa 20P • Tặng USB Token",
+        desc: "Trọn gói giải pháp phát hành hóa đơn điện tử và ký số khai thuế qua mạng theo chuẩn Tổng cục Thuế."
+      },
+      {
+        id: 602,
+        shopId: "ketoan-thue-datphu",
+        category: "ketoan",
+        name: "Gói 1.000 Hóa Đơn Khởi Tạo Từ Máy Tính Tiền (Nghị Định 70)",
+        price: 890000,
+        originalPrice: 1200000,
+        image: "🧾",
+        badge: "Hộ Kinh Doanh",
+        promo: "Giảm 30% thuế TNCN theo NĐ 398/2026",
+        desc: "Tích hợp xuất hóa đơn trực tiếp khi khách thanh toán VietQR cho nhà hàng, quán ăn, đặc sản, tạp hóa."
+      }
+    ];
+
+    // 3. DANH MỤC 8 NHÓM
+    const categoriesData = [
+      { id: "all", name: "Tất Cả", icon: "fa-border-all", color: "dp-bg-blue" },
+      { id: "ocop", name: "Đặc Sản OCOP", icon: "fa-drumstick-bite", color: "bg-red-600" },
+      { id: "docu_sach", name: "Sách & Đồ Cũ", icon: "fa-book-open", color: "bg-amber-600" },
+      { id: "xecu", name: "Xe Máy Biển 78", icon: "fa-motorcycle", color: "bg-orange-600" },
+      { id: "kythuat", name: "Gọi Thợ 6K", icon: "fa-wrench", color: "bg-blue-600" },
+      { id: "suata", name: "Sữa Tã Mẹ & Bé", icon: "fa-baby", color: "bg-emerald-600" },
+      { id: "chay", name: "Ẩm Thực Chay", icon: "fa-leaf", color: "bg-teal-600" },
+      { id: "ketoan", name: "Kế Toán Thuế", icon: "fa-file-invoice-dollar", color: "bg-purple-600" }
+    ];
+
+    // 4. QUẢN LÝ TRẠNG THÁI SÀN (STATE)
+    let currentCategory = "all";
+    let searchQuery = "";
+    let currentSort = "featured";
+    let cart = [];
+
+    // Load Cart from LocalStorage
+    try {
+      const savedCart = localStorage.getItem("dp_ecommerce_cart_v1");
+      if (savedCart) cart = JSON.parse(savedCart);
+    } catch(e) { console.error(e); }
+
+    // RENDER CATEGORY BAR
+    function renderCategoryBar() {
+      const bar = document.getElementById("categoryBar");
+      bar.innerHTML = categoriesData.map(c => `
+        <div onclick="setFilterCategory('${c.id}')" class="flex flex-col items-center gap-1.5 p-2 rounded-2xl bg-white border border-slate-200 cursor-pointer card-hover text-center ${currentCategory === c.id ? 'ring-2 ring-red-500 bg-red-50/50' : ''}">
+          <div class="w-10 h-10 rounded-xl ${c.color} text-white flex items-center justify-center text-sm shadow-sm">
+            <i class="fa-solid ${c.icon}"></i>
+          </div>
+          <span class="text-[11px] font-bold text-slate-700 leading-tight">${c.name}</span>
+        </div>
+      `).join('');
+    }
+
+    // RENDER SHOWROOM GIAN HÀNG TIÊU BIỂU
+    function renderShopGrid() {
+      const grid = document.getElementById("shopGrid");
+      grid.innerHTML = shopsData.map(s => `
+        <div id="shopCard-${s.id}" class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col justify-between card-hover transition duration-300">
+          <div>
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex items-center gap-2.5">
+                <div class="w-11 h-11 rounded-xl text-white font-black flex items-center justify-center text-sm shadow" style="background:${s.avatarBg}">
+                  ${s.avatar}
+                </div>
+                <div>
+                  <h4 class="font-extrabold text-sm dp-text-blue">${s.name}</h4>
+                  <div class="flex items-center gap-1.5 mt-0.5">
+                    <span class="text-[10px] font-bold text-white dp-bg-red px-1.5 py-0.2 rounded">${s.tag}</span>
+                    <span class="text-[10px] text-amber-500 font-bold"><i class="fa-solid fa-star"></i> ${s.rating}</span>
+                    <span class="text-[10px] text-slate-400">(${s.orders}+ đơn)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p class="text-xs text-slate-600 mt-2.5 line-clamp-2">${s.desc}</p>
+            <div class="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
+              <i class="fa-solid fa-location-dot text-slate-400"></i> ${s.address}
+            </div>
+          </div>
+
+          <div class="mt-3.5 pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+            <a href="./zalo_ai_chat.html?shop=${s.id}&role=customer" class="flex-1 bg-red-50 hover:bg-red-100 dp-text-red font-bold text-xs py-2 rounded-xl text-center border border-red-200 transition">
+              💬 Chat Với AI Của Tiệm
+            </a>
+            <button onclick="filterByShop('${s.id}')" class="dp-bg-blue hover:bg-blue-900 text-white font-bold text-xs px-3 py-2 rounded-xl transition">
+              Xem Món
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // RENDER SẢN PHẨM SÀN
+    function renderProductsGrid() {
+      const grid = document.getElementById("productsMarketGrid");
+      const emptyAlert = document.getElementById("emptyCatalogAlert");
+
+      let filtered = productsData.filter(p => {
+        const matchCat = (currentCategory === "all" || p.category === currentCategory);
+        const matchSearch = (!searchQuery || 
+          p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+          p.desc.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        return matchCat && matchSearch;
+      });
+
+      // Sắp xếp
+      if (currentSort === "price-asc") {
+        filtered.sort((a, b) => a.price - b.price);
+      } else if (currentSort === "price-desc") {
+        filtered.sort((a, b) => b.price - a.price);
+      }
+
+      if (filtered.length === 0) {
+        grid.innerHTML = "";
+        emptyAlert.classList.remove("hidden");
+        return;
+      }
+      emptyAlert.classList.add("hidden");
+
+      grid.innerHTML = filtered.map(p => {
+        const shop = shopsData.find(s => s.id === p.shopId) || { name: "Đất Phú OneBase" };
+        const discountPct = p.originalPrice ? Math.round((1 - p.price / p.originalPrice) * 100) : 0;
+        return `
+          <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm flex flex-col justify-between card-hover relative group">
+            ${discountPct > 0 ? `
+              <span class="absolute top-2.5 right-2.5 bg-red-100 text-red-700 text-[10px] font-black px-1.5 py-0.5 rounded-full z-10">
+                -${discountPct}%
+              </span>
+            ` : ''}
+
+            <div>
+              <div class="h-28 rounded-xl bg-slate-50 flex items-center justify-center text-4xl mb-2 relative overflow-hidden group-hover:scale-105 transition duration-300">
+                <span>${p.image}</span>
+                <span class="absolute bottom-1 left-1.5 text-[9px] font-bold bg-black/60 text-white px-1.5 py-0.5 rounded backdrop-blur-sm">
+                  ${p.badge}
+                </span>
+              </div>
+
+              <div class="text-[10px] text-slate-400 font-semibold truncate flex items-center gap-1">
+                <i class="fa-solid fa-store text-slate-300"></i> ${shop.name}
+              </div>
+
+              <h4 class="font-extrabold text-xs text-slate-800 mt-1 line-clamp-2 leading-tight group-hover:text-red-600 transition">
+                ${p.name}
+              </h4>
+
+              <div class="mt-2 flex items-baseline gap-1.5 flex-wrap">
+                <span class="text-sm font-black dp-text-red">${p.price.toLocaleString('vi-VN')}đ</span>
+                ${p.originalPrice ? `<span class="text-[10px] text-slate-400 line-through">${p.originalPrice.toLocaleString('vi-VN')}đ</span>` : ''}
+              </div>
+
+              <div class="text-[10px] text-emerald-700 font-bold mt-1 line-clamp-1">
+                ✓ ${p.promo}
+              </div>
+            </div>
+
+            <div class="mt-3 pt-2 border-t border-slate-100 grid grid-cols-2 gap-1.5">
+              <a href="./zalo_ai_chat.html?shop=${p.shopId}" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] py-2 rounded-xl text-center" title="Hỏi trợ lý AI về món này">
+                🤖 Hỏi AI
+              </a>
+              <button onclick="addToCart(${p.id})" class="dp-bg-red hover:bg-red-700 text-white font-extrabold text-[11px] py-2 rounded-xl shadow transition flex items-center justify-center gap-1">
+                <i class="fa-solid fa-cart-plus"></i> Đặt Mua
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // XỬ LÝ LỌC DANH MỤC
+    function setFilterCategory(catId) {
+      currentCategory = catId;
+      document.querySelectorAll(".filter-pill").forEach(el => {
+        el.classList.remove("active", "dp-bg-blue", "text-white");
+        el.classList.add("bg-slate-100", "text-slate-700");
+      });
+      const activeEl = document.getElementById("pill-" + catId);
+      if (activeEl) {
+        activeEl.classList.add("active", "dp-bg-blue", "text-white");
+        activeEl.classList.remove("bg-slate-100", "text-slate-700");
+      }
+      renderCategoryBar();
+      renderProductsGrid();
+    }
+
+    function filterByShop(shopId) {
+      const prods = productsData.filter(p => p.shopId === shopId);
+      if (prods.length > 0) {
+        currentCategory = prods[0].category;
+        setFilterCategory(currentCategory);
+        scrollToSection('catalogSection');
+      }
+    }
+
+    function quickFilter(kw) {
+      searchQuery = kw;
+      document.getElementById("searchInput").value = kw;
+      renderProductsGrid();
+      scrollToSection('catalogSection');
+    }
+
+    function handleSearch(val) {
+      searchQuery = val.trim();
+      renderProductsGrid();
+    }
+
+    function executeSearch() {
+      renderProductsGrid();
+      scrollToSection('catalogSection');
+    }
+
+    function resetFilters() {
+      currentCategory = "all";
+      searchQuery = "";
+      document.getElementById("searchInput").value = "";
+      const searchMob = document.getElementById("searchInputMobile");
+      if (searchMob) searchMob.value = "";
+      setFilterCategory("all");
+    }
+
+    function applySorting(val) {
+      currentSort = val;
+      renderProductsGrid();
+    }
+
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // 5. GIỎ HÀNG & CHECKOUT VIETQR
+    function saveCart() {
+      try {
+        localStorage.setItem("dp_ecommerce_cart_v1", JSON.stringify(cart));
+      } catch(e) { console.error(e); }
+      updateCartBadge();
+    }
+
+    function updateCartBadge() {
+      const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
+      const b1 = document.getElementById("cartCountBadge");
+      const b2 = document.getElementById("cartCountBadgeMobile");
+      if (b1) b1.innerText = totalCount;
+      if (b2) b2.innerText = totalCount;
+    }
+
+    function addToCart(prodId) {
+      const p = productsData.find(x => x.id === prodId);
+      if (!p) return;
+      const exist = cart.find(x => x.id === prodId);
+      if (exist) {
+        exist.qty += 1;
+      } else {
+        cart.push({ ...p, qty: 1 });
+      }
+      saveCart();
+      // Hiệu ứng thông báo nhỏ
+      const btn = event.currentTarget;
+      const originHtml = btn.innerHTML;
+      btn.innerHTML = `<i class="fa-solid fa-check"></i> Đã Thêm`;
+      btn.classList.add("bg-emerald-600");
+      setTimeout(() => {
+        btn.innerHTML = originHtml;
+        btn.classList.remove("bg-emerald-600");
+      }, 1000);
+    }
+
+    function updateItemQty(prodId, delta) {
+      const item = cart.find(x => x.id === prodId);
+      if (!item) return;
+      item.qty += delta;
+      if (item.qty <= 0) {
+        cart = cart.filter(x => x.id !== prodId);
+      }
+      saveCart();
+      renderCartModalBody();
+    }
+
+    function openCartModal() {
+      renderCartModalBody();
+      document.getElementById("cartModal").classList.remove("hidden");
+    }
+
+    function closeCartModal() {
+      document.getElementById("cartModal").classList.add("hidden");
+    }
+
+    function renderCartModalBody() {
+      const container = document.getElementById("cartItemsList");
+      const totalEl = document.getElementById("cartTotalMoney");
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-10 text-slate-400">
+            <i class="fa-solid fa-cart-arrow-down text-4xl mb-2 text-slate-300"></i>
+            <div class="font-bold text-slate-600">Giỏ hàng của bạn đang trống</div>
+            <p class="text-xs text-slate-400 mt-1">Hãy lướt Chợ Phiên Đất Phú và chọn món ưng ý nhé!</p>
+          </div>
+        `;
+        totalEl.innerText = "0đ";
+        return;
+      }
+
+      let total = 0;
+      container.innerHTML = cart.map(item => {
+        const subtotal = item.price * item.qty;
+        total += subtotal;
+        return `
+          <div class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-200 gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="text-2xl">${item.image}</span>
+              <div class="min-w-0">
+                <h5 class="font-bold text-xs dp-text-blue truncate">${item.name}</h5>
+                <div class="dp-text-red font-black text-xs mt-0.5">${item.price.toLocaleString('vi-VN')}đ</div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              <div class="flex items-center border border-slate-300 rounded-xl bg-white overflow-hidden text-xs">
+                <button onclick="updateItemQty(${item.id}, -1)" class="w-7 h-7 flex items-center justify-center text-slate-600 hover:bg-slate-100 font-bold">-</button>
+                <span class="w-8 text-center font-bold text-slate-800">${item.qty}</span>
+                <button onclick="updateItemQty(${item.id}, 1)" class="w-7 h-7 flex items-center justify-center text-slate-600 hover:bg-slate-100 font-bold">+</button>
+              </div>
+              <button onclick="updateItemQty(${item.id}, -999)" class="text-slate-400 hover:text-red-600 text-xs p-1" title="Xóa món">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      totalEl.innerText = total.toLocaleString('vi-VN') + "đ";
+    }
+
+    function processCheckoutVietQr() {
+      if (cart.length === 0) {
+        alert("Giỏ hàng của bạn đang trống!");
+        return;
+      }
+      const phone = document.getElementById("checkoutPhone").value.trim();
+      const address = document.getElementById("checkoutAddress").value.trim();
+
+      if (!phone || phone.length < 9) {
+        alert("Vui lòng nhập Số điện thoại nhận hàng hợp lệ để nhân viên và thợ 6K liên hệ giao hàng!");
+        document.getElementById("checkoutPhone").focus();
+        return;
+      }
+      if (!address) {
+        alert("Vui lòng nhập Địa chỉ giao hàng tại Tuy Hòa hoặc Phú Yên!");
+        document.getElementById("checkoutAddress").focus();
+        return;
+      }
+
+      const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+      const orderCode = "DP" + Math.floor(1000 + Math.random() * 9000);
+      const memo = `${orderCode} ${phone.replace(/\./g, '')}`;
+
+      // Tạo mã VietQR chuẩn Vietcombank của Đất Phú
+      const qrUrl = `https://img.vietqr.io/image/VCB-0751000025858-compact2.png?amount=${total}&addInfo=${encodeURIComponent(memo)}&accountName=${encodeURIComponent('CONG TY TNHH THUONG MAI DAT PHU')}`;
+      
+      document.getElementById("qrOrderTitle").innerText = `Đơn Hàng Sàn: ${orderCode}`;
+      document.getElementById("qrModalAmount").innerText = total.toLocaleString('vi-VN') + "đ";
+      document.getElementById("qrCheckoutImg").src = qrUrl;
+
+      // Lưu đơn vào danh sách để kế toán và chủ tiệm theo dõi
+      try {
+        const oldOrders = JSON.parse(localStorage.getItem('dp_commercial_orders_v4') || '[]');
+        const newOrderObj = {
+          shopId: cart[0].shopId || "datphu-kythuat",
+          segment: "🛍️ Khách Đặt Qua Sàn TMĐT",
+          time: "Vừa xong",
+          phone: phone,
+          item: `${cart.map(c => `${c.name} (x${c.qty})`).join(', ')} [Mã: ${orderCode}]`,
+          amount: total,
+          shop: "Sàn Đất Phú OneBase"
+        };
+        oldOrders.unshift(newOrderObj);
+        localStorage.setItem('dp_commercial_orders_v4', JSON.stringify(oldOrders));
+
+        // ĐỒNG THỜI GỬI LÊN BACKEND CSDL Ổ E (E:\datphu-onebase\data\db\orders.json)
+        fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: orderCode,
+            shopId: cart[0].shopId || "datphu-kythuat",
+            customerName: "Khách Đặt Sàn " + phone,
+            phone: phone,
+            address: address,
+            items: cart,
+            amount: total,
+            status: "pending_payment",
+            paymentMethod: "VietQR"
+          })
+        }).catch(err => console.log("Lưu offline localStorage:", err));
+      } catch(e) { console.error(e); }
+
+      closeCartModal();
+      document.getElementById("vietQrModal").classList.remove("hidden");
+    }
+
+    function closeVietQrModal() {
+      document.getElementById("vietQrModal").classList.add("hidden");
+    }
+
+    function confirmOrderSuccess() {
+      alert("🎉 CẢM ƠN ANH/CHỊ ĐÃ ĐẶT HÀNG TRÊN SÀN ĐẤT PHÚ ONEBASE!\n\n• Đơn hàng đã được chuyển tới Cửa hàng & Đội điều phối 6K.\n• Nhân viên sẽ gọi xác nhận và giao hàng nhanh trong 15–30 phút tại Tuy Hòa.\n• Hóa đơn điện tử chuẩn Thông tư 78 sẽ được xuất kèm mã bảo hành điện tử K6!");
+      cart = [];
+      saveCart();
+      closeVietQrModal();
+    }
+
+    // 6. XỬ LÝ AUTHENTICATION (ĐĂNG NHẬP, ĐĂNG KÝ, TOKEN)
+    let isRegisterMode = false;
+    let currentUser = null;
+
+    function openAuthModal() {
+      if (currentUser) {
+        if (confirm(`Đang đăng nhập với tài khoản: ${currentUser.fullName} (${currentUser.role}). Bạn có muốn đăng xuất không?`)) {
+          currentUser = null;
+          localStorage.removeItem('dp_auth_token');
+          updateAuthUi();
+        }
+        return;
+      }
+      document.getElementById('authModal').classList.remove('hidden');
+    }
+
+    function closeAuthModal() {
+      document.getElementById('authModal').classList.add('hidden');
+    }
+
+    function toggleAuthMode() {
+      isRegisterMode = !isRegisterMode;
+      const title = document.getElementById('authModalTitle');
+      const submitBtn = document.getElementById('authSubmitBtn');
+      const toggleBtn = document.getElementById('authToggleModeBtn');
+      const extraFields = document.getElementById('authRegisterExtraFields');
+
+      if (isRegisterMode) {
+        title.innerText = '📝 Đăng Ký Tài Khoản Mới';
+        submitBtn.innerText = 'Tạo Tài Khoản Ngay';
+        toggleBtn.innerText = 'Đã có tài khoản? Quay lại đăng nhập';
+        extraFields.classList.remove('hidden');
+      } else {
+        title.innerText = '🔐 Đăng Nhập Hệ Thống';
+        submitBtn.innerText = 'Đăng Nhập Ngay';
+        toggleBtn.innerText = 'Chưa có tài khoản? Đăng ký mới';
+        extraFields.classList.add('hidden');
+      }
+    }
+
+    async function handleAuthSubmit() {
+      const phone = document.getElementById('authPhone').value.trim();
+      const password = document.getElementById('authPassword').value.trim();
+
+      if (!phone || !password) {
+        alert('Vui lòng nhập đầy đủ Số điện thoại và Mật khẩu!');
+        return;
+      }
+
+      if (isRegisterMode) {
+        const fullName = document.getElementById('authFullName').value.trim();
+        const role = document.getElementById('authRole').value;
+        try {
+          const res = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone, password, fullName, role })
+          });
+          const data = await res.json();
+          if (data.success) {
+            currentUser = data.user;
+            localStorage.setItem('dp_auth_token', data.token);
+            alert(`🎉 Đăng ký thành công! Chào mừng ${currentUser.fullName} (${currentUser.role}). Dữ liệu đã lưu vào ổ E!`);
+            closeAuthModal();
+            updateAuthUi();
+          } else {
+            alert('Lỗi: ' + data.error);
+          }
+        } catch(e) {
+          alert('Không thể kết nối Backend server ổ E: ' + e.message);
+        }
+      } else {
+        try {
+          const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone, password })
+          });
+          const data = await res.json();
+          if (data.success) {
+            currentUser = data.user;
+            localStorage.setItem('dp_auth_token', data.token);
+            alert(`✅ Đăng nhập thành công! Xin chào ${currentUser.fullName} (${currentUser.role}).`);
+            closeAuthModal();
+            updateAuthUi();
+          } else {
+            alert('Đăng nhập thất bại: ' + data.error);
+          }
+        } catch(e) {
+          alert('Không thể kết nối Backend server ổ E: ' + e.message);
+        }
+      }
+    }
+
+    function updateAuthUi() {
+      const authTxt = document.getElementById('authStatusText');
+      const authBtn = document.getElementById('authBtnModal');
+      if (currentUser) {
+        if (authTxt) authTxt.innerHTML = `👤 Xin chào: <b class="text-amber-300">${currentUser.fullName}</b> (<span class="uppercase">${currentUser.role}</span>)`;
+        if (authBtn) authBtn.innerHTML = `<i class="fa-solid fa-right-from-bracket"></i> Đăng Xuất`;
+      } else {
+        if (authTxt) authTxt.innerText = '';
+        if (authBtn) authBtn.innerHTML = `<i class="fa-solid fa-user-lock"></i> Đăng Nhập / Đăng Ký`;
+      }
+    }
+
+    // 7. XỬ LÝ FILE STORAGE UPLOAD LÊN Ổ E
+    let selectedFileBase64 = null;
+    let selectedFileName = '';
+
+    function openStorageModal() {
+      document.getElementById('storageModal').classList.remove('hidden');
+    }
+
+    function closeStorageModal() {
+      document.getElementById('storageModal').classList.add('hidden');
+    }
+
+    function previewUploadFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      selectedFileName = file.name;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        selectedFileBase64 = e.target.result;
+        document.getElementById('storagePreviewBox').classList.remove('hidden');
+        document.getElementById('storagePreviewName').innerText = file.name;
+        document.getElementById('storagePreviewSize').innerText = `${Math.round(file.size / 1024)} KB`;
+        if (file.type.startsWith('image/')) {
+          document.getElementById('storagePreviewImg').src = selectedFileBase64;
+        } else {
+          document.getElementById('storagePreviewImg').src = 'https://placehold.co/48x48/1B2A6B/ffffff?text=DOC';
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function executeUploadFile() {
+      if (!selectedFileBase64) {
+        alert('Vui lòng chọn 1 tệp hình ảnh hoặc tài liệu trước!');
+        return;
+      }
+      const fileType = document.getElementById('uploadTargetFolder').value;
+      const btn = document.getElementById('btnExecuteUpload');
+      btn.innerText = '⏳ Đang tải file lên ổ E...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/storage/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            base64Data: selectedFileBase64,
+            fileName: selectedFileName,
+            fileType: fileType
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          const alertBox = document.getElementById('uploadResultAlert');
+          alertBox.classList.remove('hidden');
+          alertBox.innerHTML = `
+            ✅ <b>ĐÃ LƯU TỆP THÀNH CÔNG VÀO Ổ E!</b><br/>
+            • Tên file: <b class="font-mono">${data.fileName}</b> (${Math.round(data.sizeBytes / 1024)} KB)<br/>
+            • Vị trí ổ E: <code class="text-[10px] bg-white p-0.5 rounded">${data.savedOnDriveE}</code><br/>
+            • Đường dẫn Web: <a href="${data.url}" target="_blank" class="underline text-blue-700 font-bold">${data.url}</a>
+          `;
+          btn.innerText = '✅ Tải Lên Thành Công!';
+        } else {
+          alert('Lỗi upload: ' + data.error);
+          btn.innerText = '🚀 Thử Lại';
+        }
+      } catch(e) {
+        alert('Lỗi kết nối upload: ' + e.message);
+        btn.innerText = '🚀 Thử Lại';
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // 8. KẾT NỐI REALTIME SERVER-SENT EVENTS (SSE)
+    function initRealtimeConnection() {
+      const pill = document.getElementById('realtimeStatusPill');
+      if (!window.EventSource) {
+        if (pill) pill.innerHTML = `<span>Ổ E: Offline (No SSE)</span>`;
+        return;
+      }
+
+      const sse = new EventSource('/api/realtime');
+      sse.addEventListener('connected', (e) => {
+        if (pill) pill.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span><span>Ổ E: CSDL & Realtime Live</span>`;
+      });
+
+      sse.addEventListener('new_order', (e) => {
+        try {
+          const order = JSON.parse(e.data);
+          // Phát thông báo âm thanh hoặc banner nổi khi có đơn hàng mới
+          console.log("⚡ [Realtime Ổ E] Đơn hàng mới phát sinh:", order);
+          const toast = document.createElement('div');
+          toast.className = 'fixed top-20 right-4 z-50 bg-slate-900 text-white p-3 rounded-2xl shadow-2xl border-2 border-amber-400 flex items-center gap-3 animate-bounce';
+          toast.innerHTML = `
+            <span class="text-xl">🔔</span>
+            <div class="text-xs">
+              <div class="font-extrabold text-amber-300">ĐƠN HÀNG MỚI (REALTIME Ổ E): #${order.id}</div>
+              <div>${order.customerName} vừa đặt <b class="text-red-400">${order.amount.toLocaleString('vi-VN')}đ</b></div>
+            </div>
+          `;
+          document.body.appendChild(toast);
+          setTimeout(() => toast.remove(), 6000);
+        } catch(err) { console.error(err); }
+      });
+
+      sse.onerror = () => {
+        if (pill) pill.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400"></span><span>Ổ E: Đang kết nối lại...</span>`;
+      };
+    }
+
+    // 9. QUẢN LÝ ĐIỀU PHỐI GỌI THỢ 6K & CỨU HỘ KHẨN CẤP
+    const mockWorkers6k = [
+      {
+        id: "w_01",
+        fullName: "Nguyễn Văn Phú",
+        phone: "0977.334.455",
+        skill: "Điện Lạnh & Gia Dụng Inverter",
+        district: "TP. Tuy Hòa (Cách 1.8km)",
+        rating: 5.0,
+        jobs: 128
+      },
+      {
+        id: "w_02",
+        fullName: "Trần Minh Khoa",
+        phone: "0935.889.900",
+        skill: "Điện - Nước & Tự Động Hóa 6K",
+        district: "Phú Hòa / Tuy Hòa (Cách 2.4km)",
+        rating: 4.9,
+        jobs: 95
+      },
+      {
+        id: "w_03",
+        fullName: "Lê Hoàng Nam",
+        phone: "0905.112.233",
+        skill: "Kiểm Định Xe Cũ & Đồ Cũ 6K",
+        district: "P.5 Tuy Hòa (Cách 0.9km)",
+        rating: 4.9,
+        jobs: 84
+      },
+      {
+        id: "w_04",
+        fullName: "Võ Tấn Lực",
+        phone: "0988.990.011",
+        skill: "Thông Nghẹt & Máy Bơm Tự Động",
+        district: "Đông Hòa / Tuy Hòa (Cách 4.2km)",
+        rating: 5.0,
+        jobs: 110
+      }
+    ];
+
+    function openWorkerDispatchModal() {
+      renderModalWorkersList();
+      document.getElementById('workerDispatchModal').classList.remove('hidden');
+    }
+
+    function closeWorkerDispatchModal() {
+      document.getElementById('workerDispatchModal').classList.add('hidden');
+    }
+
+    function renderModalWorkersList() {
+      const container = document.getElementById('modalLiveWorkersList');
+      if (!container) return;
+      container.innerHTML = mockWorkers6k.map(w => `
+        <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-2">
+          <div>
+            <div class="font-bold dp-text-blue text-xs flex items-center gap-1.5">
+              <span>🛠️ ${w.fullName}</span>
+              <span class="text-[9px] font-bold bg-emerald-100 text-emerald-800 px-1 rounded">Trực Ca</span>
+            </div>
+            <div class="text-[11px] text-slate-700 font-semibold">${w.skill}</div>
+            <div class="text-[10px] text-slate-500">📍 ${w.district} • ★ ${w.rating} (${w.jobs} ca)</div>
+          </div>
+          <a href="tel:${w.phone.replace(/\./g, '')}" class="dp-bg-red text-white font-bold text-[11px] px-3 py-1.5 rounded-lg shadow-sm">
+            📞 Gọi
+          </a>
+        </div>
+      `).join('');
+    }
+
+    function submitWorkerDispatchRequest() {
+      const phone = document.getElementById('workerCustomerPhone')?.value.trim();
+      const address = document.getElementById('workerCustomerAddress')?.value.trim();
+      const serviceRadio = document.querySelector('input[name="quickService"]:checked')?.value || "Tháo lắp máy lạnh|500000";
+      const [serviceName, priceStr] = serviceRadio.split('|');
+      const price = Number(priceStr) || 500000;
+
+      if (!phone || phone.length < 9) {
+        alert('Vui lòng nhập Số điện thoại liên hệ để thợ nhận đơn và gọi xác nhận trước khi đến!');
+        return;
+      }
+      if (!address) {
+        alert('Vui lòng nhập địa chỉ cần thợ tới gấp!');
+        return;
+      }
+
+      const reqCode = "REQ-" + Math.floor(100000 + Math.random() * 900000);
+      const randomOtp = "6821";
+
+      // Đẩy vào CSDL đơn hàng trên ổ E
+      fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: reqCode,
+          shopId: "datphu-kythuat",
+          customerName: "Khách Gọi Thợ " + phone,
+          phone: phone,
+          address: address,
+          items: [{ name: serviceName, qty: 1, price: price }],
+          amount: price,
+          status: "dispatched",
+          paymentMethod: "VietQR_OTP_6K"
+        })
+      }).catch(e => console.log(e));
+
+      closeWorkerDispatchModal();
+
+      alert(`⚡ LỆNH CỨU HỘ 6K ĐÃ ĐƯỢC PHÁT THÀNH CÔNG!\n\n` +
+        `• Mã điều phối: ${reqCode}\n` +
+        `• Dịch vụ: ${serviceName} (${price.toLocaleString('vi-VN')}đ)\n` +
+        `• Thợ tiếp nhận: Nguyễn Văn Phú (Cách 1.8km)\n` +
+        `• Cam kết: Có mặt tại "${address}" trong 15–20 phút\n` +
+        `• Mã OTP Nghiệm thu K5 của bạn: [ ${randomOtp} ]\n\n` +
+        `(Khách hàng chỉ đọc mã OTP cho thợ sau khi đã kiểm tra máy móc hoạt động tốt!)`
+      );
+    }
+
+    // INIT APP
+    window.onload = function() {
+      renderCategoryBar();
+      renderShopGrid();
+      renderProductsGrid();
+      updateCartBadge();
+      initRealtimeConnection();
+
+      // Kiểm tra tham số điều hướng URL (?shopId=... & ?category=...)
+      const urlParams = new URLSearchParams(window.location.search);
+      const reqShopId = urlParams.get('shopId');
+      const reqCat = urlParams.get('category');
+
+      if (reqShopId) {
+        setTimeout(() => {
+          const targetCard = document.getElementById(`shopCard-${reqShopId}`);
+          if (targetCard) {
+            targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            targetCard.classList.add('ring-4', 'ring-red-500', 'shadow-2xl');
+            setTimeout(() => targetCard.classList.remove('ring-4', 'ring-red-500'), 4000);
+          }
+        }, 350);
+      }
+
+      if (reqCat && reqCat !== 'all') {
+        const catMap = {
+          'dienlanh': 'kythuat',
+          'diennuoc': 'kythuat',
+          'xemay': 'xecu',
+          'nhomkinh': 'kythuat',
+          'suanha': 'kythuat',
+          'thongnghet': 'kythuat',
+          'maygiat': 'kythuat',
+          'bocxep': 'kythuat'
+        };
+        const mappedCat = catMap[reqCat] || reqCat;
+        if (categoriesData.some(c => c.id === mappedCat)) {
+          setFilterCategory(mappedCat);
+        }
+      }
+
+      // Kiểm tra session Auth
+      const token = localStorage.getItem('dp_auth_token');
+      if (token) {
+        fetch('/api/auth/me', { headers: { 'Authorization': `Bearer ${token}` } })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              currentUser = data.user;
+              updateAuthUi();
+            }
+          }).catch(() => {});
+      }
+    };
+  </script>
+</body>
+</html>

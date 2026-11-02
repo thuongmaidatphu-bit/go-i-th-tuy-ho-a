@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Khảo Sát Hài Lòng Thợ Kỹ Thuật & Nhận Voucher 5% — Đất Phú 6K</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              red: '#D32027',
+              navy: '#1B2A6B',
+              dark: '#0B132B',
+              amber: '#F59E0B',
+              gold: '#FFD700',
+              card: '#162238'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .star-rating .star {
+      transition: transform 0.2s, color 0.2s;
+      cursor: pointer;
+    }
+    .star-rating .star:hover,
+    .star-rating .star.active {
+      color: #F59E0B;
+      transform: scale(1.15);
+    }
+    .pill-check {
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .pill-check.selected {
+      background-color: #D32027;
+      color: #ffffff;
+      border-color: #D32027;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans pb-16">
+
+  <!-- TOP HEADER -->
+  <header class="bg-brand-navy border-b border-blue-900/60 sticky top-0 z-40 backdrop-blur-md bg-opacity-95">
+    <div class="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <a href="javascript:history.back()" class="w-9 h-9 rounded-lg bg-blue-900/40 flex items-center justify-center text-slate-300 hover:text-white hover:bg-blue-800/60">
+          <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <div class="flex items-center space-x-2">
+          <span class="w-8 h-8 rounded-lg bg-brand-red flex items-center justify-center text-white font-black text-sm shadow-md">6K</span>
+          <div>
+            <h1 class="text-sm font-bold text-white tracking-wide uppercase">Đất Phú Kín Kẽ OS</h1>
+            <p class="text-[11px] text-amber-400 font-medium">Khảo Sát Độ Hài Lòng & Nhận Quà</p>
+          </div>
+        </div>
+      </div>
+      <a id="btnBackProfile" href="tho_gian_hang.html" class="text-xs bg-blue-900/50 hover:bg-blue-800 text-blue-200 px-3 py-1.5 rounded-lg border border-blue-700/50 flex items-center gap-1.5 transition">
+        <i class="fa-solid fa-store"></i>
+        <span>Gian Hàng</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-2xl mx-auto px-4 pt-4">
+
+    <!-- REWARD BANNER -->
+    <div class="bg-gradient-to-r from-red-950/80 via-brand-card to-blue-950/80 border border-amber-500/40 rounded-2xl p-4 shadow-xl mb-5 relative overflow-hidden">
+      <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-amber-500/10 rounded-full blur-xl pointer-events-none"></div>
+      <div class="flex items-start gap-3.5">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-slate-950 text-xl font-black shadow-lg shrink-0">
+          <i class="fa-solid fa-gift"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="bg-amber-500/20 text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-500/30 uppercase tracking-wider">Đặc Quyền Thợ Thực Chiến</span>
+            <span class="text-xs text-slate-400">⏱️ Mất 30 giây</span>
+          </div>
+          <h2 class="text-base font-extrabold text-white mt-1">Đánh giá hôm nay — Nhận ngay Voucher -5%</h2>
+          <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+            Ý kiến của anh giúp Đất Phú tối ưu radar điều phối và giữ vững cam kết <strong class="text-amber-300">0% hoa hồng</strong>. Hoàn thành để nhận mã giảm cước chu kỳ tới!
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SURVEY FORM CARD -->
+    <div id="surveyCard" class="bg-brand-card border border-blue-900/40 rounded-2xl p-5 shadow-2xl">
+      <form id="csatForm" onsubmit="submitSurvey(event)" class="space-y-6">
+
+        <!-- THÔNG TIN THỢ -->
+        <div class="bg-slate-900/70 border border-blue-900/30 rounded-xl p-3.5 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-blue-950 border border-blue-700/60 flex items-center justify-center text-blue-400 text-lg">
+              <i class="fa-solid fa-user-gear"></i>
+            </div>
+            <div>
+              <div class="text-[11px] text-slate-400 uppercase font-semibold">Tài khoản thợ đánh giá</div>
+              <div id="displayWorkerName" class="text-sm font-bold text-white">Đang tải thông tin...</div>
+            </div>
+          </div>
+          <span id="displayWorkerBadge" class="bg-emerald-500/20 text-emerald-300 text-[11px] font-bold px-2.5 py-1 rounded-full border border-emerald-500/30">
+            THỢ 6K
+          </span>
+        </div>
+
+        <!-- TIÊU CHÍ 1: RADAR GPS -->
+        <div class="border-b border-slate-800 pb-5">
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="text-sm font-bold text-slate-200 flex items-center gap-2">
+              <i class="fa-solid fa-satellite-dish text-blue-400"></i>
+              <span>1. Độ nhạy & chuẩn xác của radar GPS gọi thợ (15P)</span>
+            </label>
+            <span id="scoreTextGps" class="text-xs font-bold text-amber-400">5/5 - Rất tốt</span>
+          </div>
+          <p class="text-xs text-slate-400 mb-3">Đơn hàng cứu hộ quét gần khu vực anh trực ca thế nào?</p>
+          <div class="star-rating flex items-center gap-2 text-2xl text-slate-600" data-field="ratingGps">
+            <i class="fa-solid fa-star star active" onclick="setStar('ratingGps', 1)"></i>
+            <i class="fa-solid fa-star star active" onclick="setStar('ratingGps', 2)"></i>
+            <i class="fa-solid fa-star star active" onclick="setStar('ratingGps', 3)"></i>
+            <i class="fa-solid fa-star star active" onclick="setStar('ratingGps', 4)"></i>
+            <i class="fa-solid fa-star star active" onclick="setStar('ratingGps', 5)"></i>
+          </div>
+        </div>
+
+        <!-- TIÊU CHÍ 2: GIAN HÀNG & PORTFOLIO -->
+        <div class="border-b border-slate-800 pb-5">
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="text-sm font-bold text-slate-200 flex items-center gap-2">
+              <i class="fa-solid fa-store text-emerald-400"></i>
+              <span>2. Gian hàng số cá nhân & Kho ảnh công trình Geostamp</span>
+            </label>
+            <span id="scoreTextStorefront" class="text-xs font-bold text-amber-400">5/5 - Rất tốt</span>
+          </div>
+          <p class="text-xs text-slate-400 mb-3">Thao tác tải ảnh công trình, cập nhật bảng giá và bật trực ca có dễ dàng không?</p>
+          <div class="star-rating flex items-center gap-2 text-2xl text-slate-600" data-field="ratingStorefront">
+            <i class="fa-solid fa-star star active" onclick="setStar('ratingStorefront', 1)"></i>
+            <i class="fa-solid fa-star star active" onclick="setStar('ratingStorefront', 2)"></i>
+            <i class="fa-solid fa-star star active" onclick="setStar('ratingStorefront', 3)"></i>
+            <i class="fa-solid fa-star star active" onclick="setStar('ratingStorefront', 4)"></i>
+            <i class="fa-solid fa-star star active" onclick="setStar('ratingStorefront', 5)"></i>
+          </div>
+        </div>
+
+        <!-- TIÊU CHÍ 3: CHÍNH SÁCH 0% HOA HỒNG -->
+        <div class="border-b border-slate-800 pb-5">
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="text-sm font-bold text-slate-200 flex items-center gap-2">
+              <i class="fa-solid fa-hand-holding-dollar text-amber-400"></i>
+              <span>3. Chính sách 0% hoa hồng (Thợ giữ 100% tiền công)</span>
+            </label>
+            <span id="scoreTextCommission" class="text-xs font-bold text-amber-400">5/5 - Rất tốt</span>
+          </div>
+          <p class="text-xs text-slate-400 mb-3">Mô hình chỉ thu phí phần mềm định kỳ, không cắt phế cuốc thợ có làm anh an tâm?</p>
+          <div class="star-rating flex items-center gap-2 text-2xl text-slate-600" data-field="ratingCommissionPolicy">
+            <i class="fa-solid fa-star star active" onclick="setStar('ratingCommissionPolicy', 1)"></i>
+            <i class="fa-solid fa-star star active" onclick="setStar('ratingCommissionPolicy', 2)"></i>
+            <i class="fa-solid fa-star star active" onclick="setStar('ratingCommissionPolicy', 3)"></i>
+            <i class="fa-solid fa-star star active" onclick="setStar('ratingCommissionPolicy', 4)"></i>
+            <i class="fa-solid fa-star star active" onclick="setStar('ratingCommissionPolicy', 5)"></i>
+          </div>
+        </div>
+
+        <!-- TIÊU CHÍ 4: HỖ TRỢ KỸ THUẬT 24/7 -->
+        <div class="border-b border-slate-800 pb-5">
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="text-sm font-bold text-slate-200 flex items-center gap-2">
+              <i class="fa-solid fa-headset text-purple-400"></i>
+              <span>4. Tốc độ & thái độ hỗ trợ của Tổng đài Đất Phú</span>
+            </label>
+            <span id="scoreTextSupport" class="text-xs font-bold text-amber-400">5/5 - Rất tốt</span>
+          </div>
+          <p class="text-xs text-slate-400 mb-3">Mức độ hỗ trợ khi anh cần tư vấn thao tác hoặc đối soát cước?</p>
+          <div class="star-rating flex items-center gap-2 text-2xl text-slate-600" data-field="ratingSupport">
+            <i class="fa-solid fa-star star active" onclick="setStar('ratingSupport', 1)"></i>
+            <i class="fa-solid fa-star star active" onclick="setStar('ratingSupport', 2)"></i>
+            <i class="fa-solid fa-star star active" onclick="setStar('ratingSupport', 3)"></i>
+            <i class="fa-solid fa-star star active" onclick="setStar('ratingSupport', 4)"></i>
+            <i class="fa-solid fa-star star active" onclick="setStar('ratingSupport', 5)"></i>
+          </div>
+        </div>
+
+        <!-- GÓP Ý NHANH (TAGS) -->
+        <div>
+          <label class="block text-sm font-bold text-slate-200 mb-2">
+            Chọn nhận xét nhanh (chạm để chọn nhiều):
+          </label>
+          <div class="flex flex-wrap gap-2" id="tagsContainer">
+            <span class="pill-check text-xs font-medium px-3 py-1.5 rounded-full border border-slate-700 bg-slate-900 text-slate-300" onclick="toggleTag(this)">Định vị radar rất chuẩn</span>
+            <span class="pill-check text-xs font-medium px-3 py-1.5 rounded-full border border-slate-700 bg-slate-900 text-slate-300" onclick="toggleTag(this)">0% hoa hồng rất sướng</span>
+            <span class="pill-check text-xs font-medium px-3 py-1.5 rounded-full border border-slate-700 bg-slate-900 text-slate-300" onclick="toggleTag(this)">Ứng dụng mượt mà, dễ dùng</span>
+            <span class="pill-check text-xs font-medium px-3 py-1.5 rounded-full border border-slate-700 bg-slate-900 text-slate-300" onclick="toggleTag(this)">Mong có thêm đơn cứu hộ ban đêm</span>
+            <span class="pill-check text-xs font-medium px-3 py-1.5 rounded-full border border-slate-700 bg-slate-900 text-slate-300" onclick="toggleTag(this)">Cần mở rộng thêm vùng Phú Hòa / Đông Hòa</span>
+            <span class="pill-check text-xs font-medium px-3 py-1.5 rounded-full border border-slate-700 bg-slate-900 text-slate-300" onclick="toggleTag(this)">Tổng đài hỗ trợ rất nhiệt tình</span>
+          </div>
+        </div>
+
+        <!-- Ý KIẾN ĐÓNG GÓP TỰ DO -->
+        <div>
+          <label class="block text-sm font-bold text-slate-200 mb-1.5">
+            Ý kiến hoặc đề xuất tính năng mới cho phần mềm:
+          </label>
+          <textarea id="feedbackText" rows="3" placeholder="Nhập tâm tư, góp ý để ban quản trị Đất Phú hoàn thiện phục vụ anh tốt hơn..." class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"></textarea>
+        </div>
+
+        <!-- GIỚI THIỆU BẠN BÈ -->
+        <div class="bg-blue-950/40 border border-blue-900/40 rounded-xl p-3.5 flex items-center justify-between">
+          <div class="text-xs text-slate-300 pr-3">
+            Anh có sẵn lòng giới thiệu phần mềm Đất Phú 6K cho anh em thợ quen biết không?
+          </div>
+          <div class="flex items-center gap-3 shrink-0">
+            <label class="inline-flex items-center text-xs text-slate-200 cursor-pointer">
+              <input type="radio" name="recommend" value="yes" checked class="text-brand-red focus:ring-brand-red">
+              <span class="ml-1.5 font-semibold text-emerald-400">Có</span>
+            </label>
+            <label class="inline-flex items-center text-xs text-slate-200 cursor-pointer">
+              <input type="radio" name="recommend" value="maybe" class="text-brand-red focus:ring-brand-red">
+              <span class="ml-1.5 text-slate-400">Cân nhắc</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- NÚT GỬI ĐÁNH GIÁ -->
+        <button type="submit" id="btnSubmitSurvey" class="w-full py-3.5 px-4 rounded-xl font-black text-sm uppercase tracking-wider text-white bg-gradient-to-r from-brand-red to-red-700 hover:from-red-600 hover:to-brand-red shadow-lg shadow-red-900/40 active:scale-[0.99] transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-paper-plane"></i>
+          <span>Gửi Đánh Giá & Nhận Voucher 5%</span>
+        </button>
+
+      </form>
+    </div>
+
+    <!-- SUCCESS POPUP / VOUCHER CARD -->
+    <div id="voucherResultCard" class="hidden bg-brand-card border-2 border-amber-500 rounded-2xl p-6 shadow-2xl text-center space-y-4">
+      <div class="w-16 h-16 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center text-3xl mx-auto animate-bounce">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      <div>
+        <h3 class="text-xl font-black text-white">CẢM ƠN ANH ĐÃ ĐÓNG GÓP Ý KIẾN!</h3>
+        <p class="text-xs text-slate-300 mt-1">Đất Phú xin gửi tặng anh mã ưu đãi độc quyền:</p>
+      </div>
+
+      <!-- VOUCHER TICKET -->
+      <div class="bg-gradient-to-r from-red-950 via-slate-900 to-blue-950 border-2 border-dashed border-amber-400 rounded-xl p-4 relative">
+        <div class="text-[11px] text-amber-400 font-bold uppercase tracking-wider">MÃ VOUCHER GIA HẠN THUÊ BAO</div>
+        <div id="voucherCodeDisplay" class="text-2xl font-black text-white tracking-widest my-1.5 font-mono">
+          KHAOSAT5-W01
+        </div>
+        <div class="text-xs text-emerald-400 font-semibold">Giảm thêm 5% cước cho mọi chu kỳ gia hạn</div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-2.5 pt-2">
+        <button onclick="copyVoucherCode()" class="flex-1 py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 border border-slate-700 transition">
+          <i class="fa-regular fa-copy"></i>
+          <span id="copyBtnText">Sao Chép Mã</span>
+        </button>
+        <a id="btnGoToRenew" href="#" class="flex-1 py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-lg transition">
+          <i class="fa-solid fa-bolt"></i>
+          <span>Gia Hạn Gói Cước Ngay</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- RECENT COMMUNITY FEEDBACK PREVIEW -->
+    <div class="mt-8">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+          <i class="fa-solid fa-comments text-amber-400"></i>
+          <span>Ý kiến thợ kỹ thuật khác (Công khai)</span>
+        </h3>
+        <span id="totalFeedbackCount" class="text-[11px] text-slate-500">Đang tải...</span>
+      </div>
+      <div id="communityFeedbackList" class="space-y-3">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // State
+    const urlParams = new URLSearchParams(window.location.search);
+    const workerId = urlParams.get('workerId') || 'w_01';
+    let currentVoucherCode = '';
+
+    const ratings = {
+      ratingGps: 5,
+      ratingStorefront: 5,
+      ratingCommissionPolicy: 5,
+      ratingSupport: 5
+    };
+
+    const scoreLabels = {
+      1: '1/5 - Rất chưa hài lòng',
+      2: '2/5 - Chưa hài lòng',
+      3: '3/5 - Bình thường',
+      4: '4/5 - Tốt',
+      5: '5/5 - Rất tốt'
+    };
+
+    // Load initial data
+    document.addEventListener('DOMContentLoaded', async () => {
+      document.getElementById('btnBackProfile').href = `tho_gian_hang.html?workerId=${workerId}`;
+
+      // Fetch worker name
+      try {
+        const res = await fetch(`http://localhost:3456/api/workers`);
+        if (res.ok) {
+          const workers = await res.json();
+          const w = workers.find(x => x.id === workerId);
+          if (w) {
+            document.getElementById('displayWorkerName').innerText = `${w.fullName} (${w.skill})`;
+            document.getElementById('displayWorkerBadge').innerText = w.district || 'Tuy Hòa';
+          } else {
+            document.getElementById('displayWorkerName').innerText = `Thợ Kỹ Thuật (${workerId.toUpperCase()})`;
+          }
+        }
+      } catch (e) {
+        document.getElementById('displayWorkerName').innerText = `Thợ Kỹ Thuật (${workerId.toUpperCase()})`;
+      }
+
+      // Load existing reviews/feedback
+      loadCommunityFeedback();
+    });
+
+    // Rating star handler
+    function setStar(field, value) {
+      ratings[field] = value;
+      const container = document.querySelector(`[data-field="${field}"]`);
+      const stars = container.querySelectorAll('.star');
+      stars.forEach((star, index) => {
+        if (index < value) {
+          star.classList.add('active');
+          star.classList.remove('text-slate-600');
+        } else {
+          star.classList.remove('active');
+          star.classList.add('text-slate-600');
+        }
+      });
+
+      // Update text label
+      const mapLabel = {
+        ratingGps: 'scoreTextGps',
+        ratingStorefront: 'scoreTextStorefront',
+        ratingCommissionPolicy: 'scoreTextCommission',
+        ratingSupport: 'scoreTextSupport'
+      };
+      const labelId = mapLabel[field];
+      if (labelId) {
+        document.getElementById(labelId).innerText = scoreLabels[value];
+      }
+    }
+
+    // Toggle Tag Pill
+    function toggleTag(el) {
+      el.classList.toggle('selected');
+    }
+
+    // Submit Survey
+    async function submitSurvey(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSubmitSurvey');
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Đang xử lý...</span>`;
+
+      // Collect tags
+      const selectedTags = [];
+      document.querySelectorAll('#tagsContainer .pill-check.selected').forEach(tag => {
+        selectedTags.push(tag.innerText.trim());
+      });
+
+      const feedback = document.getElementById('feedbackText').value.trim();
+      const recommendVal = document.querySelector('input[name="recommend"]:checked')?.value === 'yes';
+      const workerName = document.getElementById('displayWorkerName').innerText;
+
+      const payload = {
+        workerId,
+        workerName,
+        ratingGps: ratings.ratingGps,
+        ratingStorefront: ratings.ratingStorefront,
+        ratingCommissionPolicy: ratings.ratingCommissionPolicy,
+        ratingSupport: ratings.ratingSupport,
+        tags: selectedTags,
+        feedback,
+        wouldRecommend: recommendVal
+      };
+
+      try {
+        const res = await fetch('http://localhost:3456/api/surveys/technician', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          currentVoucherCode = data.voucherCode;
+          document.getElementById('voucherCodeDisplay').innerText = data.voucherCode;
+          document.getElementById('btnGoToRenew').href = `tho_gian_hang.html?workerId=${workerId}&tab=subscription&voucher=${data.voucherCode}`;
+
+          // Swap views
+          document.getElementById('surveyCard').classList.add('hidden');
+          document.getElementById('voucherResultCard').classList.remove('hidden');
+
+          // Refresh feed
+          loadCommunityFeedback();
+        } else {
+          alert('Có lỗi xảy ra: ' + (data.error || 'Vui lòng thử lại'));
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>Gửi Đánh Giá & Nhận Voucher 5%</span>`;
+        }
+      } catch (err) {
+        alert('Không thể kết nối đến máy chủ: ' + err.message);
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>Gửi Đánh Giá & Nhận Voucher 5%</span>`;
+      }
+    }
+
+    // Copy Voucher Code
+    function copyVoucherCode() {
+      if (!currentVoucherCode) return;
+      navigator.clipboard.writeText(currentVoucherCode);
+      const btnText = document.getElementById('copyBtnText');
+      btnText.innerText = 'Đã Sao Chép!';
+      setTimeout(() => { btnText.innerText = 'Sao Chép Mã'; }, 2000);
+    }
+
+    // Load Community Feedback Feed
+    async function loadCommunityFeedback() {
+      try {
+        const res = await fetch('http://localhost:3456/api/surveys/technician');
+        if (!res.ok) return;
+        const data = await res.json();
+        const list = data.surveys || [];
+        document.getElementById('totalFeedbackCount').innerText = `${list.length} lượt thợ đánh giá • Điểm TB: ${data.averageSatisfactionScore || 5.0}★`;
+
+        const container = document.getElementById('communityFeedbackList');
+        if (list.length === 0) {
+          container.innerHTML = `<div class="text-xs text-slate-500 italic text-center py-4">Chưa có phản hồi nào. Hãy là người đầu tiên!</div>`;
+          return;
+        }
+
+        container.innerHTML = list.slice(0, 5).map(item => `
+          <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-3.5 space-y-2">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-blue-900/60 text-blue-300 text-xs flex items-center justify-center font-bold">
+                  ${(item.workerName || 'T').charAt(0)}
+                </span>
+                <span class="text-xs font-bold text-white">${item.workerName || 'Thợ Kỹ Thuật'}</span>
+              </div>
+              <div class="flex items-center text-amber-400 text-xs gap-1 font-bold">
+                <span>${item.averageRating || 5}</span>
+                <i class="fa-solid fa-star text-[10px]"></i>
+              </div>
+            </div>
+            ${item.tags && item.tags.length ? `
+              <div class="flex flex-wrap gap-1.5">
+                ${item.tags.map(t => `<span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-md border border-slate-700/60">${t}</span>`).join('')}
+              </div>
+            ` : ''}
+            ${item.feedback ? `<p class="text-xs text-slate-300 italic">"${item.feedback}"</p>` : ''}
+            <div class="text-[10px] text-slate-500 flex items-center justify-between pt-1 border-t border-slate-800/60">
+              <span>Mã thợ: ${item.workerId || 'N/A'}</span>
+              <span>${new Date(item.createdAt).toLocaleDateString('vi-VN')}</span>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        console.error('Lỗi tải feedback:', e);
+      }
+    }
+  </script>
+</body>
+</html>

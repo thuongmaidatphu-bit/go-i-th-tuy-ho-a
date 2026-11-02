@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mắt Thần Giám Sát Lỗi n8n & Sự Cố Hệ Thống — Đất Phú 6K</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              red: '#D32027',
+              navy: '#1B2A6B',
+              dark: '#070D1F',
+              card: '#0F1A36',
+              amber: '#F59E0B'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .pulse-critical {
+      animation: pulse-red 2s infinite;
+    }
+    @keyframes pulse-red {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+    }
+  </style>
+</head>
+<body class="bg-brand-dark text-slate-100 min-h-screen font-sans pb-16">
+
+  <!-- TOP BAR -->
+  <header class="bg-brand-navy border-b border-blue-900/60 sticky top-0 z-40 backdrop-blur-md bg-opacity-95">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <a href="javascript:history.back()" class="w-9 h-9 rounded-lg bg-blue-950/70 border border-blue-800/60 flex items-center justify-center text-slate-300 hover:text-white">
+          <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-lg bg-brand-red flex items-center justify-center text-white font-black text-xs shadow-md">
+            <i class="fa-solid fa-eye"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-sm font-extrabold text-white tracking-wide uppercase">MẮT THẦN GIÁM SÁT LỖI N8N</h1>
+              <span id="sseStatusPill" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>REALTIME LIVE</span>
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-400 font-medium">Bảng Điều Khiển Sự Cố & Kiểm Toán Đất Phú Kín Kẽ OS™ 2026</p>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="simulateN8nError()" class="text-xs bg-red-600/80 hover:bg-red-600 text-white font-bold px-3 py-1.5 rounded-xl border border-red-500/50 flex items-center gap-1.5 shadow transition">
+          <i class="fa-solid fa-bug"></i>
+          <span class="hidden sm:inline">Mô Phỏng Lỗi n8n</span>
+        </button>
+        <button onclick="loadDashboardData()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-xl border border-slate-700 flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-rotate"></i>
+          <span class="hidden sm:inline">Làm Mới</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 pt-6 space-y-6">
+
+    <!-- 4 KPI CARDS -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <!-- SỨC KHỎE HỆ THỐNG -->
+      <div class="bg-brand-card border border-blue-900/40 rounded-2xl p-4 shadow-xl">
+        <div class="flex items-center justify-between text-xs text-slate-400">
+          <span>Sức Khỏe Hệ Thống</span>
+          <i class="fa-solid fa-heart-pulse text-emerald-400 text-base"></i>
+        </div>
+        <div class="text-2xl sm:text-3xl font-black text-emerald-400 mt-2" id="metricHealthScore">--%</div>
+        <div class="text-[11px] text-slate-400 mt-1">Đánh giá tự động theo thời gian thực</div>
+      </div>
+
+      <!-- SỰ CỐ CHƯA XỬ LÝ -->
+      <div class="bg-brand-card border border-blue-900/40 rounded-2xl p-4 shadow-xl">
+        <div class="flex items-center justify-between text-xs text-slate-400">
+          <span>Chưa Khắc Phục</span>
+          <i class="fa-solid fa-triangle-exclamation text-amber-400 text-base"></i>
+        </div>
+        <div class="text-2xl sm:text-3xl font-black text-amber-400 mt-2" id="metricUnresolved">--</div>
+        <div class="text-[11px] text-slate-400 mt-1">Yêu cầu can thiệp kỹ thuật</div>
+      </div>
+
+      <!-- SỰ CỐ CRITICAL -->
+      <div class="bg-brand-card border border-red-500/40 rounded-2xl p-4 shadow-xl pulse-critical">
+        <div class="flex items-center justify-between text-xs text-slate-400">
+          <span>Khẩn Cấp (Critical)</span>
+          <i class="fa-solid fa-fire text-red-500 text-base"></i>
+        </div>
+        <div class="text-2xl sm:text-3xl font-black text-red-500 mt-2" id="metricCritical">--</div>
+        <div class="text-[11px] text-red-400 font-semibold mt-1">Ảnh hưởng GPS / Thanh toán</div>
+      </div>
+
+      <!-- ĐÃ KHẮC PHỤC -->
+      <div class="bg-brand-card border border-blue-900/40 rounded-2xl p-4 shadow-xl">
+        <div class="flex items-center justify-between text-xs text-slate-400">
+          <span>Đã Khắc Phục</span>
+          <i class="fa-solid fa-circle-check text-blue-400 text-base"></i>
+        </div>
+        <div class="text-2xl sm:text-3xl font-black text-blue-400 mt-2" id="metricResolved">--</div>
+        <div class="text-[11px] text-slate-400 mt-1">Lưu trữ kiểm toán bất biến</div>
+      </div>
+
+    </div>
+
+    <!-- MAIN INCIDENTS TABLE / FEED -->
+    <div class="bg-brand-card border border-blue-900/40 rounded-2xl p-5 shadow-2xl space-y-4">
+      
+      <!-- HEADER & FILTERS -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+        <div>
+          <h2 class="text-base font-extrabold text-white flex items-center gap-2">
+            <i class="fa-solid fa-list-check text-amber-400"></i>
+            <span>Danh Sách Sự Cố Tự Động Bắt Qua n8n Error Trigger</span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">Tự động bắn Telegram Bot & Email quản trị khi phát hiện lỗi node</p>
+        </div>
+
+        <div class="flex items-center gap-1.5 bg-slate-900/90 p-1 rounded-xl border border-slate-800">
+          <button onclick="setFilter('all')" id="btnFilter-all" class="filter-pill text-xs font-bold px-3 py-1.5 rounded-lg bg-blue-600 text-white transition">Tất Cả</button>
+          <button onclick="setFilter('unresolved')" id="btnFilter-unresolved" class="filter-pill text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Chưa Xử Lý</button>
+          <button onclick="setFilter('critical')" id="btnFilter-critical" class="filter-pill text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Critical</button>
+          <button onclick="setFilter('resolved')" id="btnFilter-resolved" class="filter-pill text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Đã Xong</button>
+        </div>
+      </div>
+
+      <!-- LIST CONTAINER -->
+      <div id="incidentsContainer" class="space-y-3">
+        <!-- Rendered by JavaScript -->
+        <div class="text-center py-10 text-slate-500 text-xs">
+          <i class="fa-solid fa-spinner fa-spin text-xl mb-2"></i>
+          <div>Đang tải dữ liệu Mắt Thần...</div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- MODAL XỬ LÝ SỰ CỐ (RESOLVE MODAL) -->
+  <div id="resolveModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-blue-900/60 rounded-2xl max-w-lg w-full p-6 text-white shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="font-extrabold text-sm text-white flex items-center gap-2">
+          <i class="fa-solid fa-wrench text-amber-400"></i>
+          <span>Xác Nhận Khắc Phục Sự Cố n8n</span>
+        </h3>
+        <button onclick="closeResolveModal()" class="text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <span class="text-slate-400">Mã sự cố:</span>
+          <span class="font-bold text-white ml-2 font-mono" id="modalIncidentId">--</span>
+        </div>
+        <div>
+          <span class="text-slate-400">Workflow:</span>
+          <span class="font-bold text-amber-400 ml-2" id="modalWorkflowName">--</span>
+        </div>
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Ghi chú khắc phục (Audit Log Note):</label>
+          <textarea id="modalResolutionNotes" rows="3" placeholder="Nhập nguyên nhân gốc rễ (Root Cause) và biện pháp đã xử lý..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-white placeholder-slate-500 focus:border-amber-400 focus:outline-none"></textarea>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2.5 pt-2">
+        <button onclick="closeResolveModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300">Hủy</button>
+        <button onclick="confirmResolveIncident()" id="btnConfirmResolve" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-black text-white flex items-center gap-1.5 shadow">
+          <i class="fa-solid fa-check"></i>
+          <span>Đánh Dấu Đã Xong</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let allIncidents = [];
+    let currentFilter = 'all';
+    let selectedIncidentId = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadDashboardData();
+      initRealtimeSse();
+    });
+
+    // 1. TẢI DỮ LIỆU TỪ SERVER
+    async function loadDashboardData() {
+      try {
+        const res = await fetch('http://localhost:3456/api/errors/dashboard');
+        if (!res.ok) throw new Error('Không thể tải dữ liệu');
+        const data = await res.json();
+
+        // Update metrics
+        const m = data.metrics || {};
+        document.getElementById('metricHealthScore').innerText = `${m.systemHealthScore || 99}%`;
+        document.getElementById('metricUnresolved').innerText = m.unresolvedCount || 0;
+        document.getElementById('metricCritical').innerText = m.criticalCount || 0;
+        document.getElementById('metricResolved').innerText = m.resolvedCount || 0;
+
+        allIncidents = data.errors || [];
+        renderIncidents();
+      } catch (e) {
+        console.error('Lỗi load dashboard:', e);
+      }
+    }
+
+    // 2. LỌC VÀ RENDER DANH SÁCH SỰ CỐ
+    function setFilter(filter) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-pill').forEach(btn => {
+        btn.className = 'filter-pill text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition';
+      });
+      const activeBtn = document.getElementById(`btnFilter-${filter}`);
+      if (activeBtn) {
+        activeBtn.className = 'filter-pill text-xs font-bold px-3 py-1.5 rounded-lg bg-blue-600 text-white transition';
+      }
+      renderIncidents();
+    }
+
+    function renderIncidents() {
+      const container = document.getElementById('incidentsContainer');
+      let filtered = allIncidents;
+
+      if (currentFilter === 'unresolved') {
+        filtered = allIncidents.filter(x => x.status === 'unresolved');
+      } else if (currentFilter === 'critical') {
+        filtered = allIncidents.filter(x => x.severity === 'CRITICAL');
+      } else if (currentFilter === 'resolved') {
+        filtered = allIncidents.filter(x => x.status === 'resolved');
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 text-slate-500 text-xs">
+            <i class="fa-solid fa-circle-check text-3xl text-emerald-500/50 mb-2"></i>
+            <div>Không có sự cố nào trong bộ lọc này. Hệ thống vận hành hoàn hảo!</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(err => {
+        const isCritical = (err.severity === 'CRITICAL');
+        const isResolved = (err.status === 'resolved');
+
+        let sevBadge = `<span class="bg-blue-500/20 text-blue-300 text-[10px] font-bold px-2 py-0.5 rounded-md border border-blue-500/30">LOW</span>`;
+        if (err.severity === 'CRITICAL') sevBadge = `<span class="bg-red-500/20 text-red-300 text-[10px] font-black px-2 py-0.5 rounded-md border border-red-500/50 animate-pulse">CRITICAL</span>`;
+        else if (err.severity === 'HIGH') sevBadge = `<span class="bg-amber-500/20 text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded-md border border-amber-500/40">HIGH</span>`;
+        else if (err.severity === 'MEDIUM') sevBadge = `<span class="bg-yellow-500/20 text-yellow-300 text-[10px] font-bold px-2 py-0.5 rounded-md border border-yellow-500/30">MEDIUM</span>`;
+
+        return `
+          <div class="bg-slate-900/80 border ${isCritical && !isResolved ? 'border-red-500/60' : 'border-slate-800'} rounded-2xl p-4 transition hover:border-slate-700 space-y-3">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                ${sevBadge}
+                <span class="text-sm font-extrabold text-white">${err.workflowName}</span>
+                <span class="text-[10px] text-slate-500 font-mono">(${err.executionId || err.id})</span>
+              </div>
+              <div class="flex items-center gap-2">
+                ${isResolved ? `
+                  <span class="text-[10px] bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded-full border border-emerald-500/30">
+                    ✔ ĐÃ KHẮC PHỤC
+                  </span>
+                ` : `
+                  <button onclick="openResolveModal('${err.id}')" class="text-xs bg-emerald-600/80 hover:bg-emerald-600 text-white font-bold px-3 py-1 rounded-xl transition flex items-center gap-1">
+                    <i class="fa-solid fa-wrench"></i> Khắc Phục
+                  </button>
+                `}
+                <span class="text-[11px] text-slate-400">${new Date(err.createdAt).toLocaleTimeString('vi-VN')}</span>
+              </div>
+            </div>
+
+            <div class="bg-slate-950/80 rounded-xl p-3 border border-slate-800/80 text-xs font-mono space-y-1">
+              <div class="text-slate-400">
+                <span class="text-red-400 font-bold">Node lỗi:</span> ${err.failedNode}
+              </div>
+              <div class="text-slate-300">
+                <span class="text-amber-400 font-bold">Chi tiết:</span> ${err.errorMessage}
+              </div>
+              ${err.errorStack ? `
+                <details class="text-[11px] text-slate-500 mt-1 cursor-pointer">
+                  <summary class="hover:text-slate-400">Xem Stack Trace chi tiết</summary>
+                  <pre class="mt-1 p-2 bg-slate-900 rounded overflow-x-auto text-[10px] text-red-300 whitespace-pre-wrap">${err.errorStack}</pre>
+                </details>
+              ` : ''}
+            </div>
+
+            ${isResolved && err.resolutionNotes ? `
+              <div class="text-[11px] text-emerald-400 flex items-center gap-1.5 pt-1 border-t border-slate-800">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Ghi chú xử lý: ${err.resolutionNotes} (${new Date(err.resolvedAt).toLocaleTimeString('vi-VN')})</span>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 3. MỞ MODAL XỬ LÝ
+    function openResolveModal(id) {
+      selectedIncidentId = id;
+      const err = allIncidents.find(x => x.id === id);
+      if (!err) return;
+
+      document.getElementById('modalIncidentId').innerText = err.id;
+      document.getElementById('modalWorkflowName').innerText = err.workflowName;
+      document.getElementById('modalResolutionNotes').value = '';
+      document.getElementById('resolveModal').classList.remove('hidden');
+    }
+
+    function closeResolveModal() {
+      document.getElementById('resolveModal').classList.add('hidden');
+    }
+
+    async function confirmResolveIncident() {
+      if (!selectedIncidentId) return;
+      const notes = document.getElementById('modalResolutionNotes').value.trim();
+
+      const btn = document.getElementById('btnConfirmResolve');
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Đang lưu...`;
+
+      try {
+        const res = await fetch('http://localhost:3456/api/errors/resolve', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            incidentId: selectedIncidentId,
+            resolutionNotes: notes || 'Đã khắc phục qua bảng điều khiển',
+            adminId: 'usr_admin_01'
+          })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          closeResolveModal();
+          loadDashboardData();
+        } else {
+          alert('Lỗi: ' + (data.error || 'Không thể lưu'));
+        }
+      } catch (e) {
+        alert('Lỗi mạng: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-check"></i> <span>Đánh Dấu Đã Xong</span>`;
+      }
+    }
+
+    // 4. MÔ PHỎNG LỖI TỪ N8N
+    async function simulateN8nError() {
+      const mockWorkflows = [
+        { name: "DatPhu - Auto Dispatch GPS 15P", node: "PostGIS Spatial Nearest Worker", msg: "PostgreSQL Connection pool exhausted (Max 20 clients reached)", sev: "CRITICAL" },
+        { name: "DatPhu - SaaS Subscription Due Checks", node: "Generate VietQR Image URL", msg: "Vietcombank Open Banking API Gateway returned 502 Bad Gateway", sev: "HIGH" },
+        { name: "DatPhu - Zalo OA Notification Engine", node: "Zalo ZNS Template Dispatcher", msg: "Zalo Token expired, refresh token request failed", sev: "HIGH" }
+      ];
+      const selected = mockWorkflows[Math.floor(Math.random() * mockWorkflows.length)];
+
+      try {
+        const res = await fetch('http://localhost:3456/api/errors/log', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            workflowId: 'wf_mock_' + Date.now(),
+            workflowName: selected.name,
+            executionId: 'exec_' + Math.floor(10000 + Math.random() * 90000),
+            failedNode: selected.node,
+            errorMessage: selected.msg,
+            errorStack: `Error: ${selected.msg}\n  at NodeExecution (/n8n/workflow-runner.js:124)`,
+            severity: selected.sev
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          loadDashboardData();
+        }
+      } catch (e) {
+        alert('Không thể mô phỏng: ' + e.message);
+      }
+    }
+
+    // 5. REALTIME SSE LISTENER
+    function initRealtimeSse() {
+      try {
+        const evtSource = new EventSource('http://localhost:3456/api/realtime');
+        evtSource.onopen = () => {
+          document.getElementById('sseStatusPill').innerHTML = `
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>REALTIME LIVE</span>
+          `;
+        };
+        evtSource.addEventListener('system_error_incident', (e) => {
+          const newErr = JSON.parse(e.data);
+          loadDashboardData();
+        });
+        evtSource.addEventListener('system_error_resolved', () => {
+          loadDashboardData();
+        });
+        evtSource.onerror = () => {
+          document.getElementById('sseStatusPill').innerHTML = `
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+            <span>RECONNECTING</span>
+          `;
+        };
+      } catch (e) {
+        console.error('SSE Error:', e);
+      }
+    }
+  </script>
+</body>
+</html>

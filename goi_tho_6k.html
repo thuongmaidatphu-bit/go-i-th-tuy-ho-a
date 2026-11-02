@@ -1,0 +1,2840 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1B2A6B">
+  <link rel="icon" href="./logo_datphu.jpg">
+  <title>Tổng Đài Điều Phối Thợ Kỹ Thuật 6K & Cứu Hộ Tiệm 24/7 — Đất Phú OneBase</title>
+  
+  <!-- Tailwind CSS & Font Awesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Leaflet CSS & JS for OpenStreetMap GPS Radar -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <style>
+    :root {
+      --dp-red: #D32027;
+      --dp-blue: #1B2A6B;
+      --dp-amber: #F59E0B;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #0b1120;
+      color: #f8fafc;
+    }
+    .radar-pulse {
+      animation: pulse-ring 2.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.4); opacity: 0.2; }
+      100% { transform: scale(1.8); opacity: 0; }
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 9999px;
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .glass-card-hover {
+      transition: all 0.25s ease;
+    }
+    .glass-card-hover:hover {
+      transform: translateY(-3px);
+      border-color: rgba(245, 158, 11, 0.5);
+      box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.15);
+    }
+
+    /* LEAFLET DARK THEME & RADAR STYLES */
+    .leaflet-container {
+      background-color: #070d19 !important;
+      font-family: 'Plus Jakarta Sans', sans-serif !important;
+    }
+    .leaflet-popup-content-wrapper {
+      background: #0f172a !important;
+      color: #f8fafc !important;
+      border-radius: 1.25rem !important;
+      border: 1px solid #334155 !important;
+      box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.8), 0 0 15px rgba(245, 158, 11, 0.2) !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+    }
+    .leaflet-popup-content {
+      margin: 12px 14px !important;
+      line-height: 1.4 !important;
+    }
+    .leaflet-popup-tip {
+      background: #0f172a !important;
+      border: 1px solid #334155 !important;
+    }
+    .leaflet-control-zoom a {
+      background-color: #0f172a !important;
+      color: #f8fafc !important;
+      border-color: #334155 !important;
+    }
+    .leaflet-control-zoom a:hover {
+      background-color: #1e293b !important;
+      color: #f59e0b !important;
+    }
+    .leaflet-control-attribution {
+      background: rgba(11, 17, 32, 0.85) !important;
+      color: #64748b !important;
+      font-size: 8.5px !important;
+      border-radius: 4px;
+    }
+    .leaflet-control-attribution a {
+      color: #94a3b8 !important;
+    }
+
+    /* Custom Leaflet Worker Marker */
+    .worker-pin-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .worker-pin-bubble {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 11px;
+      color: #0b1120;
+      border: 2px solid #ffffff;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .worker-pin-wrapper:hover .worker-pin-bubble {
+      transform: scale(1.18) translateY(-4px);
+      box-shadow: 0 8px 25px rgba(245, 158, 11, 0.6);
+      border-color: #f59e0b;
+    }
+    .worker-pin-badge {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      width: 11px;
+      height: 11px;
+      border-radius: 9999px;
+      background-color: #10b981;
+      border: 2px solid #ffffff;
+      animation: pulse 1.5s infinite;
+    }
+    .worker-pin-specialty-badge {
+      position: absolute;
+      bottom: -6px;
+      background: #0f172a;
+      border: 1px solid #475569;
+      color: #f59e0b;
+      font-size: 8px;
+      font-weight: 800;
+      padding: 0.5px 4px;
+      border-radius: 4px;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    /* User GPS Pin */
+    .user-gps-pulse-ring {
+      position: absolute;
+      width: 48px;
+      height: 48px;
+      border-radius: 9999px;
+      background: rgba(59, 130, 246, 0.35);
+      animation: pulse-ring 2s infinite;
+      pointer-events: none;
+    }
+    .user-gps-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 9999px;
+      background: #3b82f6;
+      border: 3px solid #ffffff;
+      box-shadow: 0 0 12px #3b82f6;
+    }
+
+    /* Radar sweep animation overlay */
+    @keyframes sweep-spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .radar-sweep-beam {
+      animation: sweep-spin 5s linear infinite;
+      transform-origin: center center;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col pb-20 md:pb-6">
+
+  <!-- ================= TOPBAR PHÁP LÝ & BẢO CHỨNG 6K ================= -->
+  <div class="bg-slate-950/90 border-b border-slate-800 text-[11px] py-1.5 px-4 text-slate-400">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span>🏛️ <b>CÔNG TY TNHH THƯƠNG MẠI ĐẤT PHÚ</b> (MST: 4401020233)</span>
+        <span class="hidden sm:inline">• Trụ sở: Số 21/146 Ngô Gia Tự, TP. Tuy Hòa</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="./auth_partner.html?role=worker" class="text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30">
+          <i class="fa-solid fa-user-gear"></i> <span>Đăng Ký / Đăng Nhập Thợ</span>
+        </a>
+        <span class="text-emerald-400 font-bold hidden sm:inline"><i class="fa-solid fa-bolt"></i> Có Mặt 15–20P</span>
+        <a href="./ecommerce_marketplace.html" class="text-white hover:text-amber-300 font-bold flex items-center gap-1">
+          <i class="fa-solid fa-store"></i> Chợ Phiên Đất Phú
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= HEADER CHÍNH ================= -->
+  <header class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+      
+      <a href="./goi_tho_6k.html" class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xl shadow-lg shadow-amber-500/20">
+          <i class="fa-solid fa-wrench"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-base sm:text-lg font-black tracking-tight text-white">TỔNG ĐÀI GỌI THỢ 6K</span>
+            <span class="text-[9px] font-black uppercase bg-red-600 text-white px-1.5 py-0.5 rounded animate-pulse">CỨU HỘ 24/7</span>
+          </div>
+          <div class="text-[10px] text-amber-400 font-bold tracking-wider">ĐIỆN • NƯỚC • ĐIỆN LẠNH • XE CŨ • ỐP LÁT</div>
+        </div>
+      </a>
+
+      <!-- Hotline bấm gọi tức thì -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <div class="hidden md:flex flex-col text-right">
+          <span class="text-[10px] text-slate-400 font-bold">Hotline Cứu Hộ Khẩn Cấp</span>
+          <span class="text-sm font-black text-amber-400 font-mono">0935.889.900</span>
+        </div>
+        <a href="tel:0935889900" class="bg-red-600 hover:bg-red-700 text-white font-extrabold px-4 py-2.5 rounded-2xl shadow-lg shadow-red-600/30 text-xs sm:text-sm flex items-center gap-2">
+          <i class="fa-solid fa-phone-volume animate-bounce"></i>
+          <span>Gọi Cứu Hộ Ngay</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= HERO SECTION: RADAR QUÉT THỢ BÁN KÍNH 10KM ================= -->
+  <section class="max-w-7xl mx-auto px-4 mt-4 sm:mt-6">
+    <div class="relative overflow-hidden rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-slate-900 via-blue-950/70 to-slate-900 border border-slate-700/80 shadow-2xl">
+      <!-- Glow effect -->
+      <div class="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-amber-500/10 blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-20 -bottom-20 w-80 h-80 rounded-full bg-blue-500/10 blur-3xl pointer-events-none"></div>
+
+      <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        
+        <!-- Left Hero Content -->
+        <div class="lg:col-span-7 space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-xs font-bold">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Radar Quét Thợ Tự Động (PostGIS & Supabase Live)</span>
+          </div>
+
+          <h1 class="text-2xl sm:text-3xl md:text-4xl font-black leading-tight text-white tracking-tight">
+            Thợ Kỹ Thuật Bản Địa 6K <br/>
+            <span class="text-amber-400">Có Mặt Sau 15 Phút • Khóa Giá Niêm Yết K3</span>
+          </h1>
+
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-xl">
+            Không lo thợ chặt chém, không lo thợ làm ẩu! Hệ sinh thái Đất Phú OneBase kết nối <b>đội ngũ thợ tay nghề cao tại Tuy Hòa & Phú Yên</b>, chụp ảnh Geostamp tọa độ GPS và <b>chỉ giải ngân khi khách hài lòng đọc mã OTP 4 số</b>!
+          </p>
+
+          <!-- 4 Cam kết Kín Kẽ chuẩn vàng -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2 text-xs">
+            <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
+              <div class="text-amber-400 font-extrabold"><i class="fa-solid fa-clock"></i> 15 - 20P</div>
+              <div class="text-[11px] text-slate-300 mt-0.5">Có mặt tận nhà</div>
+            </div>
+            <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
+              <div class="text-amber-400 font-extrabold"><i class="fa-solid fa-tag"></i> Khóa Giá K3</div>
+              <div class="text-[11px] text-slate-300 mt-0.5">Không phát sinh</div>
+            </div>
+            <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
+              <div class="text-amber-400 font-extrabold"><i class="fa-solid fa-key"></i> OTP K5</div>
+              <div class="text-[11px] text-slate-300 mt-0.5">Nghiệm thu mới trả</div>
+            </div>
+            <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
+              <div class="text-amber-400 font-extrabold"><i class="fa-solid fa-qrcode"></i> Bảo Hành K6</div>
+              <div class="text-[11px] text-slate-300 mt-0.5">Bảo hành QR 6T</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Dynamic OpenStreetMap GPS Radar Console -->
+        <div id="radarConsoleCol" class="lg:col-span-5 flex flex-col glass-card rounded-3xl border border-amber-500/40 shadow-2xl overflow-hidden transition-all duration-300">
+          
+          <!-- Topbar điều khiển Radar & GPS -->
+          <div class="bg-slate-950/90 px-3.5 py-2.5 border-b border-slate-800 flex items-center justify-between gap-2 shrink-0">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span class="text-xs font-black text-amber-400 uppercase tracking-wide flex items-center gap-1.5">
+                <i class="fa-solid fa-satellite-dish"></i> RADAR GPS OPENSTREETMAP
+              </span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button onclick="getUserLiveLocation()" title="Bắt tọa độ GPS thực tế của bạn" class="bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white px-2.5 py-1 rounded-xl text-[10px] font-bold border border-blue-500/40 transition flex items-center gap-1 shadow-sm">
+                <i class="fa-solid fa-crosshairs text-amber-400"></i> GPS Tôi
+              </button>
+              <button onclick="recenterTuyHoa()" title="Về tâm Tuy Hòa (21/146 Ngô Gia Tự)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded-xl text-[10px] font-bold border border-slate-700 transition">
+                <i class="fa-solid fa-location-dot text-amber-400"></i>
+              </button>
+              <button onclick="triggerRadarSweep()" title="Quét tần số & cập nhật vị trí thợ" class="bg-slate-800 hover:bg-emerald-600 text-emerald-300 hover:text-white px-2 py-1 rounded-xl text-[10px] font-bold border border-slate-700 transition">
+                <i class="fa-solid fa-arrows-rotate"></i>
+              </button>
+              <button onclick="toggleMapExpand()" id="btnExpandMap" title="Phóng to toàn cảnh" class="bg-slate-800 hover:bg-amber-500 text-slate-300 hover:text-slate-950 px-2 py-1 rounded-xl text-[10px] font-bold border border-slate-700 transition">
+                <i class="fa-solid fa-expand"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Bản đồ Leaflet OpenStreetMap Viewport -->
+          <div class="relative w-full h-[360px] sm:h-[400px]" id="mapViewportWrapper">
+            <!-- Khung chứa Leaflet Map -->
+            <div id="osmRadarMap" class="w-full h-full z-0 bg-slate-950"></div>
+
+            <!-- Tia Quét Radar Xoay Tròn (Conical Radar Beam) -->
+            <div id="radarSweepOverlay" class="absolute inset-0 pointer-events-none z-10 overflow-hidden opacity-25 mix-blend-screen transition-opacity">
+              <div class="w-[200%] h-[200%] -top-1/2 -left-1/2 absolute rounded-full bg-gradient-to-tr from-amber-500/25 via-emerald-500/10 to-transparent radar-sweep-beam"></div>
+            </div>
+
+            <!-- Badge Thông Số Telemetry Nổi Góc Dưới Bản Đồ -->
+            <div class="absolute bottom-2.5 left-2.5 z-20 bg-slate-950/90 backdrop-blur-md border border-slate-800 px-3 py-1.5 rounded-2xl text-[10px] text-slate-300 flex items-center gap-2.5 shadow-xl pointer-events-none">
+              <div class="flex items-center gap-1.5">
+                <i class="fa-solid fa-location-crosshairs text-amber-400"></i>
+                <span class="font-mono text-amber-300 font-bold" id="telemetryCoords">13.0882°N, 109.3086°E</span>
+              </div>
+              <span class="text-slate-700">•</span>
+              <span class="text-emerald-400 font-bold" id="telemetryWorkersCount">5 Thợ Trực Ca</span>
+              <span class="text-slate-700">•</span>
+              <span class="text-slate-400 font-semibold">Bán kính 10km</span>
+            </div>
+          </div>
+
+          <!-- Thanh Lọc Ngành Nghề & Tùy Chọn -->
+          <div class="bg-slate-950 px-3 py-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 shrink-0">
+            <div class="flex items-center gap-1.5 overflow-x-auto custom-scroll pb-0.5" id="mapFiltersContainer">
+              <span class="text-[10px] font-bold text-slate-500 shrink-0">Lọc:</span>
+              <button onclick="filterMapWorkers('all', this)" class="worker-filter-pill active px-2.5 py-0.5 rounded-lg bg-amber-500 text-slate-950 font-black text-[10px] shrink-0">Tất Cả</button>
+              <button onclick="filterMapWorkers('dienlanh', this)" class="worker-filter-pill px-2.5 py-0.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white font-bold text-[10px] shrink-0">Điện Lạnh</button>
+              <button onclick="filterMapWorkers('diennuoc', this)" class="worker-filter-pill px-2.5 py-0.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white font-bold text-[10px] shrink-0">Điện Nước</button>
+              <button onclick="filterMapWorkers('xemay', this)" class="worker-filter-pill px-2.5 py-0.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white font-bold text-[10px] shrink-0">Xe Máy 78</button>
+              <button onclick="filterMapWorkers('nhomkinh', this)" class="worker-filter-pill px-2.5 py-0.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white font-bold text-[10px] shrink-0">Khóa Cửa</button>
+            </div>
+            <label class="flex items-center gap-1.5 text-[10px] text-slate-400 cursor-pointer shrink-0 ml-2 select-none">
+              <input type="checkbox" id="chkRadarSweep" checked onchange="toggleSweepBeam(this.checked)" class="accent-amber-400">
+              <span class="hidden sm:inline">Quét Radar</span>
+            </label>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SECTION: BỘ ICON ĐIỀU HƯỚNG NHU CẦU KHÁCH HÀNG ================= -->
+  <section class="max-w-7xl mx-auto px-4 mt-8 sm:mt-10" id="sectionDemandNavigation">
+    <div class="glass-card rounded-3xl p-6 sm:p-8 border border-amber-500/30 shadow-2xl space-y-6">
+      
+      <!-- Tiêu đề Section Nhu Cầu -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-xs font-bold mb-2">
+            <i class="fa-solid fa-compass text-amber-400 animate-spin" style="animation-duration: 8s;"></i>
+            <span>ĐIỀU HƯỚNG NHU CẦU KHÁCH HÀNG (DEMAND INTENT)</span>
+          </div>
+          <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">
+            Bạn Đang Cần Khắc Phục Sự Cố Gì? <span class="text-amber-400">Chọn 1-Chạm:</span>
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">
+            Bấm chọn đúng nhu cầu bên dưới để hệ thống tự động lọc thợ có tay nghề phù hợp và điền sẵn danh mục triệu chứng hư hỏng.
+          </p>
+        </div>
+        <div class="flex items-center gap-2 text-xs">
+          <span class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 font-semibold flex items-center gap-1.5">
+            <i class="fa-solid fa-shield-check text-emerald-400"></i> Khóa Giá Niêm Yết K3
+          </span>
+          <span class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 font-semibold flex items-center gap-1.5">
+            <i class="fa-solid fa-bolt text-amber-400"></i> 15P Có Mặt
+          </span>
+        </div>
+      </div>
+
+      <!-- Lưới 8 Icon Điều Hướng Nhu Cầu Tương Tác -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3" id="demandIconsGrid">
+        <!-- Render động qua JavaScript -->
+      </div>
+
+      <!-- KHU VỰC ĐIỀU HƯỚNG TỚI GIAN HÀNG & THỢ KỸ THUẬT TƯƠNG ỨNG -->
+      <div id="demandDestinationContainer" class="mt-4 pt-1 transition-all duration-300">
+        <!-- Render động qua JavaScript theo Nhu cầu đang chọn -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FORM ĐIỀN THÔNG TIN NHU CẦU & BẮN LỆNH ĐIỀU PHỐI ================= -->
+  <section class="max-w-7xl mx-auto px-4 mt-6" id="sectionDemandIntakeForm">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- Cột Trái (7 Cột): Form Thông Tin Nhu Cầu Khách Hàng -->
+      <div class="lg:col-span-7 glass-card rounded-3xl p-6 sm:p-7 space-y-5 border border-slate-700/80 shadow-2xl relative overflow-hidden" id="intakeFormContainer">
+        
+        <!-- Header Form -->
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3.5">
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h3 class="text-base sm:text-lg font-black text-white" id="formDemandTitle">
+                📝 Điền Thông Tin Nhu Cầu Kỹ Thuật
+              </h3>
+              <span id="activeDemandBadge" class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/40">
+                ❄️ Điện Lạnh
+              </span>
+              <span id="assignedWorkerBadge" class="hidden text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 shadow flex items-center gap-1 animate-pulse">
+                <i class="fa-solid fa-user-check"></i> <span id="assignedWorkerText">Thợ: Nguyễn Văn Phú</span>
+              </span>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">Thợ chuyên môn tiếp nhận và gọi xác nhận ngay trong 3 phút</p>
+          </div>
+          <span class="text-[10px] font-black px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shrink-0">
+            ● Trực Ca Sẵn Sàng
+          </span>
+        </div>
+
+        <!-- 1. Bấm Chọn Nhanh Triệu Chứng Thường Gặp (Symptom Quick Pills) -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label class="font-extrabold text-xs text-slate-200 flex items-center gap-1.5">
+              <span>1. Chọn nhanh triệu chứng sự cố đang gặp:</span>
+              <span class="text-[10px] text-amber-400 font-normal">(Bấm để tự động điền)</span>
+            </label>
+            <span class="text-[10px] text-slate-400">Nhu cầu thực tế</span>
+          </div>
+          <div class="flex flex-wrap gap-2" id="demandSymptomsPills">
+            <!-- Render động qua JS theo nhu cầu đang chọn -->
+          </div>
+        </div>
+
+        <!-- 2. Mức Độ Khẩn Cấp / Thời Gian Mong Muốn Có Mặt -->
+        <div>
+          <label class="font-extrabold text-xs text-slate-200 block mb-2">2. Mức độ khẩn cấp & Thời gian cần thợ đến:</label>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5" id="urgencyRadios">
+            <label class="p-3 rounded-2xl border border-red-500/60 bg-red-950/30 hover:bg-red-900/40 cursor-pointer flex items-center gap-2.5 transition urgency-opt selected" onclick="selectUrgency('urgent_15m', this)">
+              <input type="radio" name="urgencyLevel" value="urgent_15m" checked class="accent-red-500">
+              <div>
+                <div class="font-black text-xs text-red-400 flex items-center gap-1">
+                  <i class="fa-solid fa-bolt animate-pulse"></i> CỨU HỘ 15P
+                </div>
+                <div class="text-[10px] text-slate-300">Có mặt ngay lập tức</div>
+              </div>
+            </label>
+
+            <label class="p-3 rounded-2xl border border-slate-800 bg-slate-900/80 hover:bg-slate-800 cursor-pointer flex items-center gap-2.5 transition urgency-opt" onclick="selectUrgency('today_2h', this)">
+              <input type="radio" name="urgencyLevel" value="today_2h" class="accent-amber-400">
+              <div>
+                <div class="font-bold text-xs text-amber-300">Trong Ngày</div>
+                <div class="text-[10px] text-slate-400">Thời gian linh hoạt 1-3H</div>
+              </div>
+            </label>
+
+            <label class="p-3 rounded-2xl border border-slate-800 bg-slate-900/80 hover:bg-slate-800 cursor-pointer flex items-center gap-2.5 transition urgency-opt" onclick="selectUrgency('appointment', this)">
+              <input type="radio" name="urgencyLevel" value="appointment" class="accent-blue-400">
+              <div>
+                <div class="font-bold text-xs text-blue-300">Đặt Lịch Hẹn</div>
+                <div class="text-[10px] text-slate-400">Cuối tuần / Giờ hẹn</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- 3. Thông Tin Khách Hàng & Vị Trí (Có Bắt GPS 1-Chạm) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+          <div>
+            <label class="font-bold text-xs text-slate-300 block mb-1">
+              Số điện thoại người cần hỗ trợ <span class="text-red-400">*</span>
+            </label>
+            <input type="tel" id="inputDemandPhone" value="0914.882.341" placeholder="Nhập số điện thoại của bạn..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 font-mono font-bold text-amber-400 focus:outline-none focus:border-amber-400 text-sm">
+          </div>
+          <div>
+            <label class="font-bold text-xs text-slate-300 block mb-1">
+              Họ và tên người liên hệ (Tùy chọn)
+            </label>
+            <input type="text" id="inputDemandCustomerName" value="Anh Tuấn (Tuy Hòa)" placeholder="VD: Chị Lan, Anh Nam..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 font-medium text-white focus:outline-none focus:border-amber-400 text-sm">
+          </div>
+        </div>
+
+        <!-- 4. Địa Chỉ Cần Thợ Tới Kèm Nút Bắt GPS -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="font-bold text-xs text-slate-300">
+              Địa chỉ nơi cần thợ tới (Tuy Hòa / Phú Yên) <span class="text-red-400">*</span>
+            </label>
+            <button type="button" onclick="autoFillAddressFromGps()" class="text-[10px] text-blue-400 hover:text-blue-300 font-bold flex items-center gap-1 transition">
+              <i class="fa-solid fa-location-crosshairs text-amber-400"></i> Lấy GPS Hiện Tại
+            </button>
+          </div>
+          <input type="text" id="inputDemandAddress" value="Số 12 Nguyễn Huệ, P.5, TP. Tuy Hòa" placeholder="Số nhà, tên đường, phường/xã, địa điểm gần đó..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 font-medium text-white focus:outline-none focus:border-amber-400 text-sm">
+        </div>
+
+        <!-- 5. Mô Tả Chi Tiết & Tải Ảnh Hiện Trường (Geostamp K4) -->
+        <div>
+          <label class="font-bold text-xs text-slate-300 block mb-1">Mô tả chi tiết sự cố & Ghi chú bổ sung:</label>
+          <textarea id="inputDemandNotes" rows="2" placeholder="Ví dụ: Máy lạnh chảy nước dàn lạnh ướt đẫm tường, quạt kêu to cành cạch; nhà trong hẻm cần mang thang chữ A..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-amber-400"></textarea>
+        </div>
+
+        <!-- Box Tải Ảnh Hiện Trường (Lưu về E:\datphu-onebase\data\storage\images) -->
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-amber-400 text-base shrink-0 cursor-pointer hover:bg-slate-700 transition" onclick="document.getElementById('inputDemandPhoto').click()">
+              <i class="fa-solid fa-camera"></i>
+            </div>
+            <div class="min-w-0">
+              <div class="font-bold text-xs text-slate-200">Gửi ảnh chụp sự cố (Geostamp K4)</div>
+              <div class="text-[10px] text-slate-400 truncate" id="photoDemandLabel">Chụp vị trí rò rỉ, mã máy, tem điện tử... để thợ mang đúng đồ</div>
+            </div>
+          </div>
+          <input type="file" id="inputDemandPhoto" accept="image/*" class="hidden" onchange="handleDemandPhotoUpload(event)">
+          <button type="button" onclick="document.getElementById('inputDemandPhoto').click()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-bold px-3 py-1.5 rounded-xl border border-slate-700 shrink-0 transition">
+            <i class="fa-solid fa-paperclip"></i> Chọn Ảnh
+          </button>
+        </div>
+
+        <!-- Preview Ảnh Hiện Trường -->
+        <div id="demandPhotoPreviewBox" class="hidden p-2 rounded-2xl bg-slate-950 border border-slate-800 flex items-center gap-3">
+          <img id="demandPhotoPreviewImg" src="" class="w-14 h-14 object-cover rounded-xl border border-slate-700">
+          <div class="flex-1 min-w-0">
+            <div id="demandPhotoPreviewName" class="font-bold text-xs text-white truncate">hien_truong.jpg</div>
+            <div class="text-[10px] text-emerald-400 font-medium">✔ Đã nạp thành công — Lưu vào ổ E</div>
+          </div>
+          <button type="button" onclick="removeDemandPhoto()" class="text-slate-400 hover:text-red-400 text-xs p-1">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </div>
+
+        <!-- Dự Toán Chi Phí K3 & Nút Phát Lệnh -->
+        <div class="pt-2 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div>
+            <div class="text-[11px] text-slate-400 flex items-center gap-1">
+              <span>Giá niêm yết chuẩn K3:</span>
+              <i class="fa-solid fa-circle-question text-slate-500" title="Khóa giá trước khi làm, cam kết không phát sinh"></i>
+            </div>
+            <div id="displayDemandPrice" class="text-2xl font-black text-amber-400">500.000đ</div>
+            <div id="displayDemandWarranty" class="text-[10px] text-emerald-400 font-semibold">Bảo hành 6 tháng (K6)</div>
+          </div>
+          <button onclick="handleExecuteDemandSubmit()" class="w-full sm:w-auto bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-300 text-slate-950 font-black text-sm px-8 py-3.5 rounded-2xl shadow-xl shadow-amber-400/20 transition flex items-center justify-center gap-2 tracking-wide transform hover:-translate-y-0.5">
+            <i class="fa-solid fa-bolt text-red-600 animate-bounce"></i> Phát Lệnh Điều Phối Thợ 15P
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Cột Phải (5 Cột): Danh Sách Đội Thợ 6K Đang Trực Ca & Quy Trình OTP -->
+      <div class="lg:col-span-5 space-y-5">
+        
+        <!-- Danh Sách Thợ Live -->
+        <div class="glass-card rounded-3xl p-5 border border-slate-700/80 shadow-xl space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+            <h3 class="font-black text-sm text-white flex items-center gap-2">
+              <i class="fa-solid fa-users-gear text-emerald-400"></i> Đội Thợ 6K Đang Trực Ca (Live)
+            </h3>
+            <span class="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/30">
+              ● Sẵn Sàng Nhận Việc
+            </span>
+          </div>
+
+          <div class="space-y-2.5 custom-scroll max-h-[380px] overflow-y-auto pr-1" id="workersShiftList">
+            <!-- Render via JS -->
+          </div>
+        </div>
+
+        <!-- Box 6 Bước Kín Kẽ OS™ Minh Bạch -->
+        <div class="glass-card rounded-3xl p-5 border border-slate-700/80 shadow-xl space-y-3 text-xs">
+          <div class="font-extrabold text-amber-400 flex items-center gap-1.5">
+            <i class="fa-solid fa-shield-check"></i> Quy Trình Bảo Vệ Khách Hàng (6K Standard):
+          </div>
+          <div class="space-y-2 text-slate-300 text-[11px] leading-relaxed">
+            <div class="p-2 rounded-xl bg-slate-900 border border-slate-800">
+              <b class="text-amber-400">K1 & K2:</b> Định danh GPS thợ trong bán kính 10km, kiểm tra tay nghề ≥ 4.8 sao.
+            </div>
+            <div class="p-2 rounded-xl bg-slate-900 border border-slate-800">
+              <b class="text-amber-400">K3 & K4:</b> Khóa cứng giá niêm yết, thợ chụp ảnh Geostamp hiện trường trước khi làm.
+            </div>
+            <div class="p-2 rounded-xl bg-slate-900 border border-slate-800">
+              <b class="text-amber-400">K5 & K6:</b> Khách hài lòng đọc <b>mã OTP 4 số</b> mới giải ngân tiền ví thợ (95%) và cấp mã QR bảo hành điện tử 6 tháng.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MODAL XÁC NHẬN PHÁT LỆNH NHU CẦU & MÃ OTP K5 ================= -->
+  <div id="demandConfirmModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-slate-900 rounded-3xl max-w-md w-full p-6 text-white border-2 border-amber-500/50 shadow-2xl space-y-4">
+      <div class="text-center space-y-2">
+        <div class="w-14 h-14 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-2xl mx-auto shadow-lg animate-pulse">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <h4 class="text-lg font-black text-amber-400">ĐÃ PHÁT LỆNH ĐIỀU PHỐI THÀNH CÔNG!</h4>
+        <p class="text-xs text-slate-300">Thợ kỹ thuật bản địa đã nhận lệnh và đang di chuyển tới địa chỉ của bạn</p>
+      </div>
+
+      <div class="bg-slate-950 rounded-2xl p-4 border border-slate-800 space-y-2.5 text-xs">
+        <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+          <span class="text-slate-400">Mã Lệnh Nhu Cầu:</span>
+          <span id="modalDemandCode" class="font-mono font-black text-amber-400 text-sm">NC-882910</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-slate-400">Nhu cầu:</span>
+          <span id="modalDemandCategory" class="font-bold text-white">❄️ Điện Lạnh & Điều Hòa</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-slate-400">Thợ tiếp nhận:</span>
+          <span id="modalDemandWorker" class="font-bold text-emerald-300">Nguyễn Văn Phú (Cách 1.2km)</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-slate-400">Thời gian cam kết:</span>
+          <span class="font-bold text-amber-300">12 – 15 Phút có mặt</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-slate-400">Giá niêm yết K3:</span>
+          <span id="modalDemandPrice" class="font-black text-white text-sm">500.000đ</span>
+        </div>
+      </div>
+
+      <!-- Box OTP K5 -->
+      <div class="bg-red-950/40 rounded-2xl p-3.5 border border-red-500/40 text-center space-y-1">
+        <div class="text-[11px] text-red-300 font-bold uppercase tracking-wider">MÃ OTP NGHIỆM THU K5 CỦA BẠN:</div>
+        <div id="modalDemandOtp" class="font-mono text-3xl font-black text-amber-400 tracking-widest py-1">6821</div>
+        <div class="text-[10px] text-slate-300 leading-tight">
+          ⚠️ <b>LƯU Ý:</b> Chỉ đọc mã này cho thợ khi thợ làm xong, bạn đã bật máy kiểm tra chạy tốt!
+        </div>
+      </div>
+
+      <button onclick="closeDemandConfirmModal()" class="w-full bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs py-3 rounded-xl shadow transition">
+        Đã Ghi Nhớ Mã OTP • Xem Radar Thợ
+      </button>
+    </div>
+  </div>
+  </section>
+
+  <!-- ================= BẢNG BÁO GIÁ KỸ THUẬT NIÊM YẾT K3 TOÀN DIỆN ================= -->
+  <section class="max-w-7xl mx-auto px-4 mt-10">
+    <div class="glass-card rounded-3xl p-6 sm:p-8 border border-slate-700/80 shadow-xl space-y-5">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+        <div>
+          <span class="text-[10px] font-black uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-400/20">
+            Khóa Giá K3 Minh Bạch
+          </span>
+          <h3 class="text-lg sm:text-xl font-black text-white mt-1">Bảng Giá Dịch Vụ Kỹ Thuật Niêm Yết Tại TP. Tuy Hòa & Phú Yên</h3>
+          <p class="text-xs text-slate-400">Mọi ca sửa chữa đều báo giá trước, có biên bản nghiệm thu và xuất Hóa đơn điện tử Thông tư 78</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-xl border border-emerald-500/30">
+            ✔ Cam Kết Không Phụ Phí
+          </span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="priceCatalogCards">
+        <!-- Render via JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MÔ PHỎNG NGHIỆM THU OTP K5 & BẢO HÀNH QR K6 ================= -->
+  <section class="max-w-7xl mx-auto px-4 mt-8 mb-6">
+    <div class="rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-red-950/60 via-slate-900 to-blue-950/60 border border-amber-500/30 shadow-2xl space-y-4">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <span class="text-[10px] font-black uppercase text-amber-400">Nghiệm Thu Khách Hàng (Customer Control)</span>
+          <h3 class="text-lg sm:text-xl font-black text-white mt-0.5">Xác Nhận Mã OTP Nghiệm Thu & Nhận Phiếu Bảo Hành QR</h3>
+          <p class="text-xs text-slate-300">Thợ làm xong, khách kiểm tra máy vận hành ổn định mới cung cấp mã OTP 4 số.</p>
+        </div>
+        <div class="flex items-center gap-2 bg-slate-950 p-2 rounded-2xl border border-slate-800">
+          <input type="text" id="demoOtpInput" value="6821" maxlength="4" placeholder="Mã OTP 4 số..." class="w-28 text-center bg-slate-900 border border-slate-700 rounded-xl py-2 font-mono font-black text-amber-400 text-base focus:outline-none">
+          <button onclick="verifyOtpK5()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl shadow transition">
+            🔐 Xác Nhận OTP
+          </button>
+        </div>
+      </div>
+
+      <div id="otpSuccessAlert" class="hidden p-4 rounded-2xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 text-xs space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-emerald-500/30 pb-2.5">
+          <div class="font-black text-sm flex items-center gap-2">
+            <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+            <span>ĐÃ XÁC THỰC MÃ OTP (6821) — NGHIỆM THU K5 THÀNH CÔNG!</span>
+          </div>
+          <span class="text-[10px] bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded-full">
+            ● Bảo chứng Kín Kẽ
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] text-slate-200">
+          <div>• Quyết toán ví thợ (95%): <b class="text-amber-400">475.000đ</b></div>
+          <div>• Phí sàn Đất Phú (5%): <b class="text-white">25.000đ</b></div>
+          <div>• Phiếu bảo hành QR (K6): <b class="text-emerald-400">Đã kích hoạt 6 tháng</b></div>
+        </div>
+
+        <!-- 2 Nút Hành Động Chất Lượng Sau Ca: Đánh Giá & Khiếu Nại -->
+        <div class="pt-2 border-t border-emerald-500/20 flex flex-wrap items-center justify-between gap-2">
+          <div class="text-[11px] text-slate-300">
+            Hãy giúp Đất Phú nâng cao chất lượng dịch vụ:
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="openWorkerRatingModal()" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-black px-3.5 py-1.5 rounded-xl shadow text-xs flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-star text-slate-950"></i> Đánh Giá Thợ 5 Sao
+            </button>
+            <button onclick="openDisputeModal()" class="bg-red-950/80 hover:bg-red-900 text-red-300 hover:text-white border border-red-500/40 font-bold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-triangle-exclamation text-amber-400"></i> Khiếu Nại (Khóa Ví 24H)
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MODAL 1: ĐÁNH GIÁ & XẾP HẠNG THỢ 6K (RATING MODAL) ================= -->
+  <div id="workerRatingModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-slate-900 rounded-3xl max-w-md w-full p-6 text-white border-2 border-amber-500/40 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h4 class="text-base font-black text-amber-400 flex items-center gap-2">
+            <i class="fa-solid fa-award"></i> Đánh Giá & Xếp Hạng Thợ 6K
+          </h4>
+          <p class="text-xs text-slate-400">Đánh giá của bạn quyết định thứ hạng Thợ Vàng / Thợ Bạc</p>
+        </div>
+        <button onclick="closeWorkerRatingModal()" class="text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Thợ Đang Được Đánh Giá -->
+      <div class="p-3 rounded-2xl bg-slate-950 border border-slate-800 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 font-black flex items-center justify-center text-sm shadow">
+          NP
+        </div>
+        <div class="min-w-0">
+          <div class="font-bold text-xs text-white">Thợ: Nguyễn Văn Phú</div>
+          <div class="text-[10px] text-amber-400 font-semibold">Chuyên môn: Điện Lạnh Inverter • P.5 Tuy Hòa</div>
+        </div>
+      </div>
+
+      <!-- Chọn Số Sao 1–5 -->
+      <div class="text-center space-y-1">
+        <label class="font-bold text-xs text-slate-300 block">Mức độ hài lòng của bạn:</label>
+        <div class="flex items-center justify-center gap-2 text-2xl text-amber-400 cursor-pointer py-1" id="starRatingContainer">
+          <i class="fa-solid fa-star star-btn active" onclick="setStarRating(1)"></i>
+          <i class="fa-solid fa-star star-btn active" onclick="setStarRating(2)"></i>
+          <i class="fa-solid fa-star star-btn active" onclick="setStarRating(3)"></i>
+          <i class="fa-solid fa-star star-btn active" onclick="setStarRating(4)"></i>
+          <i class="fa-solid fa-star star-btn active" onclick="setStarRating(5)"></i>
+        </div>
+        <div class="text-[11px] font-black text-amber-300" id="starRatingText">5.0 / 5.0 — Rất Hài Lòng (Chuẩn Thợ Vàng)</div>
+      </div>
+
+      <!-- Tiêu Chí Đánh Giá Nhanh (Pills) -->
+      <div>
+        <label class="font-bold text-xs text-slate-300 block mb-1.5">Tiêu chí nổi bật:</label>
+        <div class="flex flex-wrap gap-1.5" id="ratingPillsContainer">
+          <button type="button" onclick="toggleRatingPill(this)" class="rating-feedback-pill active px-2.5 py-1 rounded-lg bg-amber-400 text-slate-950 font-bold text-[10px]">✔ Có mặt đúng giờ <15P</button>
+          <button type="button" onclick="toggleRatingPill(this)" class="rating-feedback-pill active px-2.5 py-1 rounded-lg bg-amber-400 text-slate-950 font-bold text-[10px]">✔ Khóa giá K3 chuẩn</button>
+          <button type="button" onclick="toggleRatingPill(this)" class="rating-feedback-pill active px-2.5 py-1 rounded-lg bg-amber-400 text-slate-950 font-bold text-[10px]">✔ Tay nghề cẩn thận</button>
+          <button type="button" onclick="toggleRatingPill(this)" class="rating-feedback-pill px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 text-[10px]">✔ Dọn dẹp sạch sẽ</button>
+          <button type="button" onclick="toggleRatingPill(this)" class="rating-feedback-pill px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 text-[10px]">✔ Lễ phép, tận tình</button>
+        </div>
+      </div>
+
+      <!-- Ý Kiến Đóng Góp -->
+      <div>
+        <label class="font-bold text-xs text-slate-300 block mb-1">Góp ý thêm (Tùy chọn):</label>
+        <textarea id="ratingCommentInput" rows="2" placeholder="Ví dụ: Thợ nhiệt tình, hút chân không gas rất kỹ, hướng dẫn sử dụng remote tiết kiệm điện..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-amber-400"></textarea>
+      </div>
+
+      <button onclick="submitWorkerRating()" class="w-full bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs py-3 rounded-xl shadow transition">
+        Gửi Đánh Giá & Tích Điểm Uy Tín
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= MODAL 2: KHIẾU NẠI & TẠM KHÓA GIẢI NGÂN (DISPUTE ESCROW LOCK) ================= -->
+  <div id="disputeModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-slate-900 rounded-3xl max-w-md w-full p-6 text-white border-2 border-red-500/50 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h4 class="text-base font-black text-red-400 flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation"></i> Khiếu Nại Dịch Vụ & Khóa Ví 24H
+          </h4>
+          <p class="text-xs text-slate-400">Bảo vệ quyền lợi khách hàng Kín Kẽ OS™</p>
+        </div>
+        <button onclick="closeDisputeModal()" class="text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Hộp Cảnh Báo Escrow Lock -->
+      <div class="p-3 rounded-2xl bg-red-950/50 border border-red-500/40 text-xs text-red-200 leading-relaxed space-y-1">
+        <div class="font-black text-red-300 flex items-center gap-1.5">
+          <i class="fa-solid fa-lock"></i> KÍCH HOẠT CƠ CHẾ ESCROW LOCK:
+        </div>
+        <div>
+          Khi gửi khiếu nại, hệ thống sẽ <b>tự động phong tỏa 95% tiền trong ví thợ trong 24 giờ</b>. Thợ Trưởng Nhóm sẽ gọi điện thẩm định trong 15 phút và <b>hoàn tiền 100% qua VietQR</b> nếu thợ làm sai quy chuẩn!
+        </div>
+      </div>
+
+      <!-- Form Chi Tiết Khiếu Nại -->
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="font-bold text-slate-300 block mb-1">Lý do khiếu nại chính <span class="text-red-400">*</span></label>
+          <select id="disputeReasonSelect" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 font-bold text-white focus:outline-none focus:border-red-400">
+            <option value="overcharged_k3">💰 Thợ tự ý thu thêm tiền ngoài giá niêm yết K3</option>
+            <option value="poor_quality">⚠️ Làm ẩu, máy móc vẫn hư hỏng hoặc phát sinh lỗi mới</option>
+            <option value="late_arrival">⏰ Đến muộn quá 20 phút mà không gọi điện thông báo</option>
+            <option value="bad_attitude">😡 Thái độ phục vụ không lịch sự, thiếu chuyên nghiệp</option>
+            <option value="privacy_breach">🔒 Nghi ngờ lộ lọt thông tin cá nhân / số điện thoại</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-300 block mb-1">Số điện thoại của bạn để nhận cuộc gọi thẩm định <span class="text-red-400">*</span></label>
+          <input type="tel" id="disputePhoneInput" value="0914.882.341" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 font-mono font-bold text-amber-400">
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-300 block mb-1">Mô tả sự cố bạn gặp phải <span class="text-red-400">*</span></label>
+          <textarea id="disputeDescInput" rows="3" placeholder="Mô tả cụ thể sự việc: Thợ thu bao nhiêu tiền, thiết bị bị lỗi gì sau khi thợ rời đi..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-red-400"></textarea>
+        </div>
+      </div>
+
+      <div class="pt-1 flex items-center justify-between gap-3">
+        <button onclick="closeDisputeModal()" class="w-1/3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs py-2.5 rounded-xl">
+          Hủy Bỏ
+        </button>
+        <button onclick="submitDisputeEscrow()" class="w-2/3 bg-red-600 hover:bg-red-700 text-white font-black text-xs py-2.5 rounded-xl shadow-lg shadow-red-600/30 transition flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-shield-halved"></i> Gửi Khiếu Nại & Khóa Ví Thợ
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL XEM NHANH GIAN HÀNG SỐ CỦA THỢ 6K ================= -->
+  <div id="workerStorefrontModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-slate-900 rounded-3xl max-w-xl w-full max-h-[90vh] overflow-y-auto custom-scroll text-white border-2 border-amber-500/50 shadow-2xl space-y-4 p-5 sm:p-6">
+      
+      <!-- Header Modal -->
+      <div class="flex items-start justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-3">
+          <div id="modalWorkerAvatar" class="w-14 h-14 rounded-2xl text-slate-950 font-black text-xl flex items-center justify-center shadow-lg border-2 border-white/20 bg-amber-400">
+            NP
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 id="modalWorkerName" class="text-base sm:text-lg font-black text-white">Nguyễn Văn Phú</h3>
+              <span id="modalWorkerBadge" class="text-[9px] font-black uppercase bg-amber-400 text-slate-950 px-2 py-0.5 rounded shadow">
+                THỢ VÀNG 6K
+              </span>
+            </div>
+            <p id="modalWorkerSpecialty" class="text-xs text-amber-300 font-bold mt-0.5">Điện Lạnh & Cơ Điện Inverter</p>
+            <div id="modalWorkerStats" class="text-[11px] text-slate-400 flex items-center gap-2 mt-1">
+              <span>★ 5.0 (143 ca)</span>
+              <span>•</span>
+              <span id="modalWorkerDistrict">📍 P.5, TP. Tuy Hòa</span>
+            </div>
+          </div>
+        </div>
+        <button onclick="closeWorkerStorefrontModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center text-sm transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Giới thiệu năng lực & Cam kết 6K -->
+      <div class="bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800 text-xs text-slate-300 leading-relaxed" id="modalWorkerBio">
+        Thợ trưởng cơ điện lạnh 6K với hơn 10 năm kinh nghiệm tại TP. Tuy Hòa. Cam kết chuẩn giá K3, bảo hành 6 tháng bằng mã QR và có mặt trong vòng 15-20 phút.
+      </div>
+
+      <!-- Bảng Giá Dịch Vụ Niêm Yết K3 Của Thợ -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <h4 class="font-bold text-xs text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-tag"></i> Bảng Giá Dịch Vụ Niêm Yết K3
+          </h4>
+          <span class="text-[10px] text-emerald-400 font-semibold">Khóa giá chống chặt chém</span>
+        </div>
+        <div class="bg-slate-950 rounded-xl p-2.5 border border-slate-800 space-y-1.5 text-xs" id="modalWorkerPricingList">
+          <!-- Render qua JS -->
+        </div>
+      </div>
+
+      <!-- Thư Viện Ảnh Công Trình Thực Tế (Geostamp) -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <h4 class="font-bold text-xs text-white uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-camera-retro text-amber-400"></i> Ảnh Công Trình Thực Tế (Geostamp Tuy Hòa)
+          </h4>
+          <span class="text-[10px] text-slate-400">Đã kiểm duyệt 6K</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2.5" id="modalWorkerPortfolioGrid">
+          <!-- Render qua JS -->
+        </div>
+      </div>
+
+      <!-- Nút Tác Vụ -->
+      <div class="pt-2 border-t border-slate-800 flex flex-col sm:flex-row items-center gap-2.5">
+        <a id="modalWorkerCallBtn" href="tel:0977334455" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 border border-slate-700">
+          <i class="fa-solid fa-phone text-amber-400"></i>
+          <span>Gọi Thợ</span>
+        </a>
+        <a id="modalWorkerFullPageBtn" href="./tho_gian_hang.html?workerId=w_01&view=preview" target="_blank" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs flex items-center justify-center gap-1.5 border border-slate-700">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          <span>Trang Gian Hàng Riêng</span>
+        </a>
+        <button id="modalWorkerAssignBtn" onclick="assignWorkerFromModal()" class="w-full sm:flex-1 py-2.5 px-4 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs shadow-lg flex items-center justify-center gap-1.5 transition">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>Gán Thợ Này Vào Lệnh Cứu Hộ</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="bg-slate-950 border-t border-slate-800 pt-8 pb-8 text-slate-500 text-xs">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-xl bg-amber-500 text-slate-950 font-black flex items-center justify-center text-sm">
+          6K
+        </div>
+        <div>
+          <div class="font-black text-slate-200">ĐẤT PHÚ 6K LABOR & COMMERCE DISPATCH</div>
+          <div class="text-[11px]">Bản quyền thuộc CÔNG TY TNHH THƯƠNG MẠI ĐẤT PHÚ (MST: 4401020233)</div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4 text-xs font-semibold">
+        <a href="./ecommerce_marketplace.html" class="hover:text-amber-400">Sàn Chợ Phiên</a>
+        <span>•</span>
+        <a href="./zalo_ai_chat.html" class="hover:text-amber-400">Trợ Lý AI 24/7</a>
+        <span>•</span>
+        <a href="./bao_gia_chatbox_ai.html" class="hover:text-amber-400">Thuê Bot 199K</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= JAVASCRIPT LOGIC TRANG GỌI THỢ ================= -->
+  <script>
+    // 0. BẢNG 8 NHÓM NHU CẦU KHÁCH HÀNG (CUSTOMER DEMAND INTENT) VỚI ĐIỀU HƯỚNG GIAN HÀNG & THỢ
+    const customerDemands = [
+      {
+        id: "dienlanh",
+        title: "Điện Lạnh",
+        subtitle: "Inverter • Máy Lạnh",
+        icon: "fa-solid fa-snowflake",
+        iconColor: "text-cyan-400",
+        badgeBg: "bg-cyan-500/20 text-cyan-300 border-cyan-400/40",
+        cardBorder: "border-cyan-500/30",
+        glowColor: "shadow-cyan-500/20",
+        mapCategory: "dienlanh",
+        defaultWorkerId: "w_01",
+        price: 500000,
+        warranty: "Bảo hành 6 tháng (K6)",
+        symptoms: [
+          "❄️ Máy lạnh chảy nước đầm đìa dàn lạnh",
+          "⚠️ Máy chạy chỉ ra gió thường, không lạnh",
+          "🔧 Cần tháo dỡ 1 bộ chuyển sang nhà mới",
+          "🧴 Vệ sinh lồng sóc khử khuẩn định kỳ",
+          "⚡ Máy chớp đèn báo lỗi bo mạch Inverter"
+        ],
+        workerInfo: {
+          id: "w_01",
+          name: "Nguyễn Văn Phú",
+          avatar: "NP",
+          avatarBg: "#F59E0B",
+          title: "Thợ Trưởng Điện Lạnh & Bo Mạch Inverter",
+          badge: "THỢ VÀNG 6K",
+          phone: "0977.334.455",
+          rating: 5.0,
+          completedJobs: 143,
+          distance: "1.2 km (P.5 Tuy Hòa)",
+          eta: "12–15 phút",
+          bio: "10 năm kinh nghiệm máy lạnh Inverter Daikin, Panasonic, Toshiba. Hút chân không gas R32 chuẩn đồng hồ, bảo hành 6 tháng bằng mã QR.",
+          specialties: ["Tháo lắp điều hòa", "Xử lý xì gas R32", "Sửa bo Inverter"],
+          pricing: [
+            { name: "Vệ sinh máy lạnh treo tường", price: "150.000đ" },
+            { name: "Tháo lắp máy lạnh Inverter (1 bộ)", price: "500.000đ" },
+            { name: "Nạp gas bổ sung R32/R410A chuẩn cân", price: "250.000đ" }
+          ],
+          storefrontUrl: "./tho_gian_hang.html?workerId=w_01&view=preview"
+        },
+        shopInfo: {
+          id: "shop-dienlanh-tuyhoa",
+          name: "Trung Tâm Điện Lạnh & Điều Hòa Đất Phú",
+          badge: "TỔNG KHO VẬT TƯ 6K",
+          address: "Số 18 Ngô Gia Tự, TP. Tuy Hòa",
+          hotline: "0935.889.900",
+          featuredItems: [
+            { name: "Ống đồng Toàn Phát 6.1/10 (Thái Lan)", price: "120.000đ/m" },
+            { name: "Gas Lạnh Daikin R32 Chính Hãng", price: "250.000đ/bình" },
+            { name: "Bo Mạch Biến Tần Inverter 6K", price: "450.000đ/bộ" }
+          ],
+          marketplaceUrl: "./ecommerce_marketplace.html?shopId=shop-dienlanh-tuyhoa&category=dienlanh"
+        }
+      },
+      {
+        id: "diennuoc",
+        title: "Sự Cố Điện",
+        subtitle: "Chập Cháy • Phao Bơm",
+        icon: "fa-solid fa-bolt-lightning",
+        iconColor: "text-amber-400",
+        badgeBg: "bg-amber-500/20 text-amber-300 border-amber-400/40",
+        cardBorder: "border-amber-500/30",
+        glowColor: "shadow-amber-500/20",
+        mapCategory: "diennuoc",
+        defaultWorkerId: "w_02",
+        price: 350000,
+        warranty: "Bảo hành 12 tháng (K6)",
+        symptoms: [
+          "⚡ Aptomat nhảy liên tục khi bật thiết bị",
+          "💥 Ổ cắm phát tia lửa, mùi khét dây điện",
+          "🌊 Phao bồn nước hỏng làm tràn bể suốt đêm",
+          "🔌 Lắp thêm rơ-le an toàn 12V máy bơm",
+          "💡 Mất điện cục bộ một phòng / cả tầng"
+        ],
+        workerInfo: {
+          id: "w_02",
+          name: "Trần Minh Khoa",
+          avatar: "MK",
+          avatarBg: "#1B2A6B",
+          title: "Kỹ Sư Điện Dân Dụng & Tự Động Hóa 6K",
+          badge: "THỢ VÀNG 6K",
+          phone: "0935.889.900",
+          rating: 4.9,
+          completedJobs: 98,
+          distance: "2.8 km (Phú Hòa)",
+          eta: "15–18 phút",
+          bio: "Chuyên xử lý chập cháy điện âm tường ban đêm, lắp phao điện tự động chống giật 12V an toàn tuyệt đối cho gia đình.",
+          specialties: ["Chập điện ngầm", "Phao điện an toàn 12V", "Aptomat chống giật"],
+          pricing: [
+            { name: "Khắc phục sự cố chập điện âm tường", price: "350.000đ" },
+            { name: "Lắp phao điện tự động 12V chống giật", price: "350.000đ" },
+            { name: "Thay mới Aptomat chống giật Panasonic", price: "220.000đ" }
+          ],
+          storefrontUrl: "./tho_gian_hang.html?workerId=w_02&view=preview"
+        },
+        shopInfo: {
+          id: "shop-phuyen-electric",
+          name: "Tổng Kho Thiết Bị Điện Nước Phú Yên",
+          badge: "ĐỐI TÁC CHÍNH HÃNG",
+          address: "Số 146 Ngô Gia Tự, TP. Tuy Hòa",
+          hotline: "0935.889.900",
+          featuredItems: [
+            { name: "Aptomat chống giật Panasonic 30mA", price: "185.000đ" },
+            { name: "Cụm Rơ-le Phao Điện An Toàn 12V", price: "220.000đ" },
+            { name: "Dây Điện Đôi Cadivi 2x2.5mm", price: "18.000đ/m" }
+          ],
+          marketplaceUrl: "./ecommerce_marketplace.html?shopId=shop-phuyen-electric&category=diennuoc"
+        }
+      },
+      {
+        id: "thongnghet",
+        title: "Cấp Thoát Nước",
+        subtitle: "Nghẹt Cống • Van Rò",
+        icon: "fa-solid fa-faucet-drip",
+        iconColor: "text-blue-400",
+        badgeBg: "bg-blue-500/20 text-blue-300 border-blue-400/40",
+        cardBorder: "border-blue-500/30",
+        glowColor: "shadow-blue-500/20",
+        mapCategory: "diennuoc",
+        defaultWorkerId: "w_04",
+        price: 250000,
+        warranty: "Bảo hành 3 tháng (K6)",
+        symptoms: [
+          "🚰 Bồn cầu dội nước không rút, trào ngược",
+          "💧 Ống nước âm tường rò rỉ làm ẩm mốc vách",
+          "🌪️ Hố ga / phễu sàn nhà tắm bốc mùi hôi",
+          "🚿 Vòi sen, van khóa tổng bị gãy rỉ sét",
+          "🌀 Máy bơm tăng áp chạy liên tục không ngắt"
+        ],
+        workerInfo: {
+          id: "w_04",
+          name: "Võ Tấn Lực",
+          avatar: "TL",
+          avatarBg: "#D32027",
+          title: "Thợ Trưởng Cấp Thoát Nước & Thông Tắc Áp Lực",
+          badge: "THỢ VÀNG 6K",
+          phone: "0988.990.011",
+          rating: 5.0,
+          completedJobs: 115,
+          distance: "4.2 km (Đông Hòa / Tuy Hòa)",
+          eta: "20–22 phút",
+          bio: "Trang bị máy lò xo công nghiệp, máy nén khí áp lực cao xử lý bồn cầu dội không trôi, van rò rỉ âm tường không đục phá.",
+          specialties: ["Thông tắc áp lực", "Ống nước âm tường", "Máy bơm tăng áp"],
+          pricing: [
+            { name: "Thông nghẹt bồn cầu / lavabo", price: "250.000đ" },
+            { name: "Thông tắc đường ống thoát sàn máy lò xo", price: "350.000đ" },
+            { name: "Dò tìm rò rỉ van nước âm tường", price: "300.000đ" }
+          ],
+          storefrontUrl: "./tho_gian_hang.html?workerId=w_04&view=preview"
+        },
+        shopInfo: {
+          id: "shop-capthoatnuoc-phuyen",
+          name: "Kho Phụ Tùng Máy Bơm & Van Nước Tiền Phong",
+          badge: "TỔNG ĐẠI LÝ VẬT TƯ",
+          address: "Quốc lộ 25, Hòa Thắng, Phú Hòa",
+          hotline: "0988.990.011",
+          featuredItems: [
+            { name: "Máy Bơm Tăng Áp Thông Minh Sena 150W", price: "1.250.000đ" },
+            { name: "Van Khóa Đồng Miha Phi 27 Chính Hãng", price: "95.000đ" },
+            { name: "Dây Lò Xo Thông Cống Thép Phi 16", price: "180.000đ" }
+          ],
+          marketplaceUrl: "./ecommerce_marketplace.html?shopId=shop-capthoatnuoc-phuyen&category=thongnghet"
+        }
+      },
+      {
+        id: "xemay",
+        title: "Cứu Hộ Xe 78",
+        subtitle: "Chết Máy • Xe Điện Cũ",
+        icon: "fa-solid fa-motorcycle",
+        iconColor: "text-red-400",
+        badgeBg: "bg-red-500/20 text-red-300 border-red-400/40",
+        cardBorder: "border-red-500/30",
+        glowColor: "shadow-red-500/20",
+        mapCategory: "xemay",
+        defaultWorkerId: "w_03",
+        price: 200000,
+        warranty: "Biên bản kiểm định 6K",
+        symptoms: [
+          "🛵 Xe máy chết máy giữa đường không đề được",
+          "🛞 Thủng lốp đêm khuya cần vá ruột/thay săm",
+          "🔍 Kiểm định xe máy cũ biển 78 trước khi mua",
+          "🔋 Xe máy điện bị đứt nguồn / chai ắc quy",
+          "⛽ Hút xăng bẩn, súc rửa bình xăng con"
+        ],
+        workerInfo: {
+          id: "w_03",
+          name: "Lê Hoàng Nam",
+          avatar: "HN",
+          avatarBg: "#059669",
+          title: "Thợ Máy Kiểm Định Xe Biển 78 & Bo Mạch Xe Điện",
+          badge: "THỢ VÀNG 6K",
+          phone: "0905.112.233",
+          rating: 4.9,
+          completedJobs: 86,
+          distance: "0.9 km (P.7 Tuy Hòa)",
+          eta: "8–10 phút",
+          bio: "12 năm tay nghề sửa xe lưu động tại Tuy Hòa. Cứu hộ chết máy, ngập nước, thay ắc quy tận nơi, kiểm định 6K xe máy cũ 78.",
+          specialties: ["Cứu hộ chết máy", "Vá xe lưu động", "Kiểm định xe cũ 78"],
+          pricing: [
+            { name: "Cứu hộ chết máy dọc đường 15P", price: "200.000đ" },
+            { name: "Vá lốp săm đêm khuya lưu động", price: "80.000đ" },
+            { name: "Kiểm định xe máy cũ trước khi mua", price: "250.000đ" }
+          ],
+          storefrontUrl: "./tho_gian_hang.html?workerId=w_03&view=preview"
+        },
+        shopInfo: {
+          id: "docu-sachxe-6k",
+          name: "Chợ Sách Cũ & Phụ Tùng Xe Cũ Biển 78 (6K)",
+          badge: "CHỢ PHIÊN 6K",
+          address: "Đường Nguyễn Huệ, P.5, TP. Tuy Hòa",
+          hotline: "0905.112.233",
+          featuredItems: [
+            { name: "Bình Ắc Quy GS 12V-5Ah Xe Máy Chính Hãng", price: "340.000đ" },
+            { name: "Săm Lốp Inoue Xe Wave/Sirius/Vision", price: "160.000đ" },
+            { name: "Nhớt Xe Số/Tay Ga Motul 10W40 (0.8L)", price: "135.000đ" }
+          ],
+          marketplaceUrl: "./ecommerce_marketplace.html?shopId=docu-sachxe-6k&category=xecu"
+        }
+      },
+      {
+        id: "khoacua",
+        title: "Khóa & Cửa Kính",
+        subtitle: "Khóa Vân Tay • Cửa Xệ",
+        icon: "fa-solid fa-key",
+        iconColor: "text-purple-400",
+        badgeBg: "bg-purple-500/20 text-purple-300 border-purple-400/40",
+        cardBorder: "border-purple-500/30",
+        glowColor: "shadow-purple-500/20",
+        mapCategory: "nhomkinh",
+        defaultWorkerId: "w_05",
+        price: 180000,
+        warranty: "Bảo hành 6 tháng (K6)",
+        symptoms: [
+          "🔑 Quên chìa / gãy chìa trong ổ khóa",
+          "🚪 Cửa nhôm Xingfa bị xệ, cạ nền khó đóng",
+          "🔒 Lắp mới ổ khóa điện tử vân tay chống trộm",
+          "🪟 Thay bản lề sàn cửa kính thủy lực",
+          "🪚 Thay tay gạt, chốt then an toàn cửa gỗ"
+        ],
+        workerInfo: {
+          id: "w_05",
+          name: "Đặng Văn Hùng",
+          avatar: "VH",
+          avatarBg: "#8B5CF6",
+          title: "Thợ Nhôm Kính Xingfa & Khóa Cửa Thông Minh",
+          badge: "THỢ VÀNG 6K",
+          phone: "0918.442.211",
+          rating: 4.8,
+          completedJobs: 74,
+          distance: "3.1 km (Bình Kiến, Tuy Hòa)",
+          eta: "16–18 phút",
+          bio: "Thợ nhôm kính cơ khí lành nghề. Chuyên chỉnh bản lề cửa xệ cạ nền, mở khóa kẹt chìa, lắp đặt khóa vân tay điện tử chống trộm.",
+          specialties: ["Khóa vân tay thông minh", "Chỉnh cửa nhôm xệ", "Bản lề thủy lực"],
+          pricing: [
+            { name: "Cân chỉnh cửa nhôm xệ cạ nền", price: "180.000đ" },
+            { name: "Mở khóa kẹt / gãy chìa khẩn cấp", price: "150.000đ" },
+            { name: "Công lắp đặt khóa cửa vân tay", price: "350.000đ" }
+          ],
+          storefrontUrl: "./tho_gian_hang.html?workerId=w_05&view=preview"
+        },
+        shopInfo: {
+          id: "shop-nhomkinh-phuyen",
+          name: "Xưởng Nhôm Kính & Khóa An Toàn KinLong",
+          badge: "ĐỐI TÁC CƠ KHÍ 6K",
+          address: "Đường Nguyễn Hữu Thọ, Bình Kiến, TP. Tuy Hòa",
+          hotline: "0918.442.211",
+          featuredItems: [
+            { name: "Khóa Cửa Thông Minh Vân Tay Kaadas", price: "2.850.000đ" },
+            { name: "Bộ Bản Lề Sàn Thủy Lực Hafele Cửa Kính", price: "890.000đ" },
+            { name: "Bộ Khóa Tay Gạt Inox 304 Cửa Gỗ/Nhôm", price: "280.000đ" }
+          ],
+          marketplaceUrl: "./ecommerce_marketplace.html?shopId=shop-nhomkinh-phuyen&category=nhomkinh"
+        }
+      },
+      {
+        id: "maygiat",
+        title: "Máy Giặt & Bếp",
+        subtitle: "Rung Lắc • Bình Nóng",
+        icon: "fa-solid fa-soap",
+        iconColor: "text-emerald-400",
+        badgeBg: "bg-emerald-500/20 text-emerald-300 border-emerald-400/40",
+        cardBorder: "border-emerald-500/30",
+        glowColor: "shadow-emerald-500/20",
+        mapCategory: "dienlanh",
+        defaultWorkerId: "w_01",
+        price: 280000,
+        warranty: "Bảo dưỡng 6 tháng (K6)",
+        symptoms: [
+          "🧺 Máy giặt cấp nước liên tục không giặt",
+          "🔊 Lồng giặt kêu to, rung lắc dữ dội khi vắt",
+          "🧴 Tháo rời lồng xịt rửa nấm mốc cặn bẩn",
+          "🚿 Bình nóng lạnh không nóng / rò rỉ điện",
+          "♨️ Lò vi sóng, bếp từ không vào nguồn"
+        ],
+        workerInfo: {
+          id: "w_01",
+          name: "Nguyễn Văn Phú & Đội Cơ Điện",
+          avatar: "NP",
+          avatarBg: "#F59E0B",
+          title: "Chuyên Sửa Máy Giặt • Bình Nóng Lạnh • Bếp Từ",
+          badge: "THỢ VÀNG 6K",
+          phone: "0977.334.455",
+          rating: 5.0,
+          completedJobs: 143,
+          distance: "1.2 km (P.5 Tuy Hòa)",
+          eta: "12–15 phút",
+          bio: "Khắc phục máy giặt rung lắc dữ dội, không vắt, tháo lồng vệ sinh diệt khuẩn, sửa rơ-le bình nóng lạnh chống rò điện.",
+          specialties: ["Máy giặt rung lắc", "Vệ sinh lồng giặt", "Bình nóng lạnh"],
+          pricing: [
+            { name: "Vệ sinh tháo lồng giặt diệt khuẩn", price: "280.000đ" },
+            { name: "Sửa máy giặt kêu to / không vắt", price: "350.000đ" },
+            { name: "Bảo dưỡng súc rửa bình nóng lạnh", price: "220.000đ" }
+          ],
+          storefrontUrl: "./tho_gian_hang.html?workerId=w_01&view=preview"
+        },
+        shopInfo: {
+          id: "shop-giadung-bep-tuyhoa",
+          name: "Trạm Linh Kiện Gia Dụng & Bếp Từ Tuy Hòa",
+          badge: "ĐẠI LÝ LINH KIỆN 6K",
+          address: "Đường Trần Hưng Đạo, P.4, TP. Tuy Hòa",
+          hotline: "0977.334.455",
+          featuredItems: [
+            { name: "Dây Curoa Máy Giặt Cửa Ngang Chính Hãng", price: "120.000đ" },
+            { name: "Van Cấp Nước Đôi Máy Giặt Tự Động", price: "160.000đ" },
+            { name: "Thanh Đốt Mayso Bình Nóng Lạnh Ariston", price: "280.000đ" }
+          ],
+          marketplaceUrl: "./ecommerce_marketplace.html?shopId=shop-giadung-bep-tuyhoa&category=maygiat"
+        }
+      },
+      {
+        id: "suanha",
+        title: "Sửa Nhà & Gạch",
+        subtitle: "Chống Thấm • Ốp Lát",
+        icon: "fa-solid fa-trowel-bricks",
+        iconColor: "text-orange-400",
+        badgeBg: "bg-orange-500/20 text-orange-300 border-orange-400/40",
+        cardBorder: "border-orange-500/30",
+        glowColor: "shadow-orange-500/20",
+        mapCategory: "nhomkinh",
+        defaultWorkerId: "w_04",
+        price: 300000,
+        warranty: "Bảo hành 12 tháng (K6)",
+        symptoms: [
+          "🌧️ Trần nhà, ban công bị dột thấm nước mưa",
+          "🧱 Nền gạch bị phồng rộp, nứt vỡ cần thay",
+          "🎨 Sơn bả lại vách tiệm / phòng ngủ",
+          "🔨 Khoan tường treo tranh, giá đỡ, kệ tivi",
+          "🏠 Dặm vá nứt tường, chống ẩm chân tường"
+        ],
+        workerInfo: {
+          id: "w_04",
+          name: "Võ Tấn Lực & Đội Thợ Nề Đất Phú",
+          avatar: "TL",
+          avatarBg: "#D32027",
+          title: "Đội Thợ Nề Chống Thấm & Ốp Lát Gạch Nền",
+          badge: "THỢ VÀNG 6K",
+          phone: "0988.990.011",
+          rating: 5.0,
+          completedJobs: 115,
+          distance: "4.2 km (Tuy Hòa / Đông Hòa)",
+          eta: "20–25 phút",
+          bio: "Đội ngũ thợ hồ kinh nghiệm lâu năm. Xử lý triệt để trần dột thấm nước mùa mưa Phú Yên, ốp lát lại gạch nền phồng rộp, dặm vá sơn tường.",
+          specialties: ["Chống thấm trần nhà", "Ốp lát gạch phồng", "Dặm vá sơn tường"],
+          pricing: [
+            { name: "Chống thấm sàn mái / ban công", price: "300.000đ/m2" },
+            { name: "Thay gạch lát nền bị phồng rộp", price: "250.000đ/m2" },
+            { name: "Khoan tường treo tranh kệ tivi gia đình", price: "150.000đ" }
+          ],
+          storefrontUrl: "./tho_gian_hang.html?workerId=w_04&view=preview"
+        },
+        shopInfo: {
+          id: "shop-vlxd-tuyhoa",
+          name: "Tổng Kho Gạch Ốp Lát & Sơn Chống Thấm Tuy Hòa",
+          badge: "VẬT LIỆU CHÍNH HÃNG",
+          address: "Đường Lê Thành Phương, P.8, TP. Tuy Hòa",
+          hotline: "0988.990.011",
+          featuredItems: [
+            { name: "Sơn Chống Thấm Kova CT-11A (Thùng 4Kg)", price: "450.000đ" },
+            { name: "Keo Dán Gạch Weber Thái Lan (Bao 20Kg)", price: "185.000đ" },
+            { name: "Gạch Lát Nền Viglacera Granite 60x60", price: "165.000đ/m2" }
+          ],
+          marketplaceUrl: "./ecommerce_marketplace.html?shopId=shop-vlxd-tuyhoa&category=suanha"
+        }
+      },
+      {
+        id: "bocxep",
+        title: "Bốc Xếp & Trọ",
+        subtitle: "Thợ Cơ Bắp • Dọn Tiệm",
+        icon: "fa-solid fa-dolly",
+        iconColor: "text-pink-400",
+        badgeBg: "bg-pink-500/20 text-pink-300 border-pink-400/40",
+        cardBorder: "border-pink-500/30",
+        glowColor: "shadow-pink-500/20",
+        mapCategory: "all",
+        defaultWorkerId: "w_06",
+        price: 150000,
+        warranty: "Bảo hiểm hàng hóa 100%",
+        symptoms: [
+          "📦 Chuyển đồ trọ sinh viên / hộ gia đình nhỏ",
+          "💪 Cần 2 thợ bốc xếp hàng hóa nông sản / chợ phiên",
+          "🚚 Thuê xe ba gác chuyển tủ lạnh, máy giặt",
+          "🧹 Dọn dẹp vệ sinh mặt bằng tiệm trước khi khai trương",
+          "🪑 Vận chuyển bàn ghế quán cafe, nhà hàng"
+        ],
+        workerInfo: {
+          id: "w_06",
+          name: "Đội Xe Ba Gác & Cửu Vạn Đất Phú",
+          avatar: "DP",
+          avatarBg: "#D32027",
+          title: "Đội Vận Chuyển Phòng Trọ & Bốc Xếp Chợ Phiên",
+          badge: "THỢ VÀNG 6K",
+          phone: "0935.889.900",
+          rating: 4.9,
+          completedJobs: 180,
+          distance: "1.5 km (Toàn TP. Tuy Hòa)",
+          eta: "15–20 phút",
+          bio: "Anh em thợ cơ bắp Phú Yên nhiệt tình, khỏe mạnh. Xe ba gác máy biển 78 chuyên dụng, chuyển trọ sinh viên, dọn tiệm kinh doanh, bảo hiểm 100% tài sản.",
+          specialties: ["Dọn nhà trọ trọn gói", "Xe ba gác máy 78", "Bốc xếp theo giờ"],
+          pricing: [
+            { name: "Bốc xếp hàng hóa / chuyển đồ theo giờ", price: "150.000đ/người/h" },
+            { name: "Chuyển đồ trọ xe ba gác trọn gói", price: "450.000đ/chuyến" },
+            { name: "Dọn dẹp mặt bằng tiệm trước khai trương", price: "350.000đ" }
+          ],
+          storefrontUrl: "./tho_gian_hang.html?workerId=w_06&view=preview"
+        },
+        shopInfo: {
+          id: "datphu-kythuat",
+          name: "Dịch Vụ Vận Chuyển & Gian Hàng Chợ Phiên Đất Phú",
+          badge: "TỔ CHỨC VẬN HÀNH 6K",
+          address: "Số 21/146 Ngô Gia Tự, P. Phú Yên, TP. Tuy Hòa",
+          hotline: "0935.889.900",
+          featuredItems: [
+            { name: "Thùng Carton Dọn Nhà Cỡ Lớn 60x40x40", price: "25.000đ/thùng" },
+            { name: "Cuộn Màng PE Quấn Hàng Chống Trầy Xước", price: "85.000đ/cuộn" },
+            { name: "Băng Keo Dán Thùng Trong Suốt 500g", price: "32.000đ/cuộn" }
+          ],
+          marketplaceUrl: "./ecommerce_marketplace.html?shopId=datphu-kythuat&category=kythuat"
+        }
+      }
+    ];
+
+    let currentDemandId = "dienlanh";
+    let selectedSymptomsList = [];
+    let currentUploadedPhotoBase64 = null;
+    let currentUrgencyLevel = "urgent_15m";
+
+    // 1. DỮ LIỆU CÁC DỊCH VỤ NIÊM YẾT K3
+    const servicesList = [
+      {
+        id: "srv_01",
+        title: "❄️ Tháo Lắp Máy Lạnh Inverter (1 Bộ)",
+        price: 500000,
+        desc: "Công tháo 200K + công lắp 300K, hút chân không, đo áp suất gas đồng hồ chuẩn.",
+        warranty: "Bảo hành 6 tháng",
+        checked: true
+      },
+      {
+        id: "srv_02",
+        title: "⚡ Sửa Chập Điện / Thay Phao Điện Tự Động",
+        price: 350000,
+        desc: "Đo ampe tải an toàn, lắp rơ-le chống giật 12V, chống cháy máy bơm nước.",
+        warranty: "Bảo hành 12 tháng",
+        checked: false
+      },
+      {
+        id: "srv_03",
+        title: "🚰 Thông Nghẹt Đường Ống / Sửa Van Nước",
+        price: 250000,
+        desc: "Dùng máy lò xo chuyên dụng không đục phá sàn, xử lý triệt để mùi hôi.",
+        warranty: "Bảo hành 3 tháng",
+        checked: false
+      },
+      {
+        id: "srv_04",
+        title: "🛵 Kiểm Định Xe Máy Cũ / Xe Điện Biển 78",
+        price: 200000,
+        desc: "Kiểm tra 18 hạng mục cơ điện, đo nén buồng đốt, tra cứu lịch sử tai nạn.",
+        warranty: "Biên bản kiểm định 6K",
+        checked: false
+      },
+      {
+        id: "srv_05",
+        title: "🧺 Vệ Sinh / Bảo Dưỡng Máy Giặt Inverter",
+        price: 280000,
+        desc: "Tháo lồng giặt xịt rửa áp lực cao, khử khuẩn bằng dung dịch sinh học.",
+        warranty: "Bảo dưỡng 6 tháng",
+        checked: false
+      },
+      {
+        id: "srv_06",
+        title: "🪚 Sửa Cửa Gỗ • Nhôm Kính • Thay Khóa Cửa",
+        price: 180000,
+        desc: "Cân chỉnh bản lề xệ, thay ổ khóa vân tay hoặc cơ, êm ái an toàn.",
+        warranty: "Bảo hành 6 tháng",
+        checked: false
+      }
+    ];
+
+    // 2. DỮ LIỆU ĐỘI THỢ NÒNG CỐT 6K VỚI TỌA ĐỘ GPS THỰC TẾ TẠI TUY HÒA & PHÚ YÊN
+    let workersList = [
+      {
+        id: "w_01",
+        name: "Nguyễn Văn Phú",
+        avatar: "NP",
+        avatarBg: "#F59E0B",
+        phone: "0977.334.455",
+        specialty: "Điện Lạnh & Cơ Điện Inverter",
+        category: "dienlanh",
+        district: "P.5, TP. Tuy Hòa",
+        street: "Đường Lê Lợi, Phường 5",
+        lat: 13.0935,
+        lng: 109.3015,
+        distance: "1.2 km (P.5 Tuy Hòa)",
+        distanceKm: 1.2,
+        etaMinutes: 12,
+        rating: 5.0,
+        jobs: 142,
+        online: true
+      },
+      {
+        id: "w_02",
+        name: "Trần Minh Khoa",
+        avatar: "MK",
+        avatarBg: "#1B2A6B",
+        phone: "0935.889.900",
+        specialty: "Điện Dân Dụng & Phao Tự Động",
+        category: "diennuoc",
+        district: "Hòa Thắng, Phú Hòa",
+        street: "Quốc lộ 25, Gần Tháp Nhạn",
+        lat: 13.0780,
+        lng: 109.2890,
+        distance: "2.8 km (Phú Hòa)",
+        distanceKm: 2.8,
+        etaMinutes: 16,
+        rating: 4.9,
+        jobs: 98,
+        online: true
+      },
+      {
+        id: "w_03",
+        name: "Lê Hoàng Nam",
+        avatar: "HN",
+        avatarBg: "#059669",
+        phone: "0905.112.233",
+        specialty: "Kiểm Định Xe Máy 78 & Bo Mạch",
+        category: "xemay",
+        district: "P.7, TP. Tuy Hòa",
+        street: "Đại lộ Hùng Vương, Phường 7",
+        lat: 13.0980,
+        lng: 109.3170,
+        distance: "0.9 km (P.7 Tuy Hòa)",
+        distanceKm: 0.9,
+        etaMinutes: 8,
+        rating: 4.9,
+        jobs: 86,
+        online: true
+      },
+      {
+        id: "w_04",
+        name: "Võ Tấn Lực",
+        avatar: "TL",
+        avatarBg: "#D32027",
+        phone: "0988.990.011",
+        specialty: "Thông Cầu Cống & Cấp Thoát Nước",
+        category: "diennuoc",
+        district: "Hòa Hiệp, Đông Hòa",
+        street: "Đường Nguyễn Tất Thành (gần Cầu Đà Nông)",
+        lat: 13.0550,
+        lng: 109.3250,
+        distance: "4.2 km (Đông Hòa)",
+        distanceKm: 4.2,
+        etaMinutes: 22,
+        rating: 5.0,
+        jobs: 115,
+        online: true
+      },
+      {
+        id: "w_05",
+        name: "Đặng Văn Hùng",
+        avatar: "VH",
+        avatarBg: "#8B5CF6",
+        phone: "0918.442.211",
+        specialty: "Sửa Cửa Gỗ • Nhôm Kính • Khóa Vân Tay",
+        category: "nhomkinh",
+        district: "Bình Kiến, TP. Tuy Hòa",
+        street: "Đường Nguyễn Hữu Thọ, Bình Kiến",
+        lat: 13.1120,
+        lng: 109.2950,
+        distance: "3.1 km (Bình Kiến)",
+        distanceKm: 3.1,
+        etaMinutes: 18,
+        rating: 4.8,
+        jobs: 74,
+        online: true
+      }
+    ];
+
+    let currentSelectedPrice = 500000;
+    let currentSelectedTitle = "❄️ Tháo Lắp Máy Lạnh Inverter (1 Bộ)";
+    
+    // BIẾN TOÀN CỤC BẢN ĐỒ LEAFLET OPENSTREETMAP
+    let osmMap = null;
+    let mapMarkers = {};
+    let geofenceCircles = [];
+    let userLocationMarker = null;
+    let hqMarker = null;
+    const TUY_HOA_HQ = [13.0882, 109.3086]; // Số 21/146 Ngô Gia Tự, TP. Tuy Hòa
+    let currentUserCoords = null;
+    let isMapExpanded = false;
+
+    // TÍNH KHOẢNG CÁCH HAVERSINE GIỮA 2 TỌA ĐỘ GPS (KM)
+    function calculateHaversineKm(lat1, lon1, lat2, lon2) {
+      const R = 6371; // Bán kính trái đất km
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a =
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return Math.round(R * c * 10) / 10;
+    }
+
+    // KHỞI TẠO BẢN ĐỒ OPENSTREETMAP RADAR
+    function initOsmRadarMap() {
+      const mapContainer = document.getElementById("osmRadarMap");
+      if (!mapContainer || osmMap) return;
+
+      // 1. Khởi tạo map Leaflet tại tọa độ Tuy Hòa
+      osmMap = L.map('osmRadarMap', {
+        center: TUY_HOA_HQ,
+        zoom: 13,
+        zoomControl: true,
+        attributionControl: true
+      });
+
+      // 2. Thêm Tile Layer CartoDB Dark Matter (Bản đồ nền tối siêu nét, tương thích theme Kín Kẽ)
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 19
+      }).addTo(osmMap);
+
+      // 3. Đánh dấu Trụ Sở Đất Phú (Tâm điểm điều phối)
+      const hqIcon = L.divIcon({
+        className: 'custom-radar-pin',
+        html: `
+          <div class="relative flex items-center justify-center">
+            <div class="absolute w-12 h-12 rounded-full bg-amber-500/30 animate-ping pointer-events-none"></div>
+            <div class="w-9 h-9 rounded-xl bg-amber-500 text-slate-950 font-black flex flex-col items-center justify-center shadow-lg border-2 border-white z-10 cursor-pointer">
+              <i class="fa-solid fa-building text-xs"></i>
+              <span class="text-[7px] font-black leading-none">HQ</span>
+            </div>
+          </div>
+        `,
+        iconSize: [36, 36],
+        iconAnchor: [18, 18]
+      });
+
+      hqMarker = L.marker(TUY_HOA_HQ, { icon: hqIcon }).addTo(osmMap);
+      hqMarker.bindPopup(`
+        <div class="p-1 text-slate-900">
+          <div class="font-black text-xs text-red-600 flex items-center gap-1">
+            <i class="fa-solid fa-shield-halved"></i> TRỤ SỞ CÔNG TY TNHH THƯƠNG MẠI ĐẤT PHÚ
+          </div>
+          <div class="text-[11px] text-slate-700 mt-1 font-medium">Số 21/146 Ngô Gia Tự, TP. Tuy Hòa, Phú Yên</div>
+          <div class="text-[10px] text-amber-700 font-bold mt-1">● Tâm phát sóng Radar Điều Phối 6K</div>
+        </div>
+      `);
+
+      // 4. Vẽ Các Vòng Geofencing Bán Kính Radar (1km, 3km, 7km, 12km)
+      drawGeofenceCircles(TUY_HOA_HQ);
+
+      // 5. Thêm Marker Cho Tất Cả Đội Thợ 6K
+      renderMapWorkerMarkers();
+
+      // 6. Lắng nghe cập nhật realtime qua SSE nếu có
+      initRealtimeSseListener();
+    }
+
+    // VẼ CÁC VÒNG BÁN KÍNH RADAR
+    function drawGeofenceCircles(centerCoords) {
+      geofenceCircles.forEach(c => osmMap.removeLayer(c));
+      geofenceCircles = [];
+
+      // Vòng 1km: Khẩn cấp nội ô (<10P)
+      const c1 = L.circle(centerCoords, {
+        radius: 1200,
+        color: '#F59E0B',
+        weight: 1.5,
+        dashArray: '4, 6',
+        fillColor: '#F59E0B',
+        fillOpacity: 0.04
+      }).addTo(osmMap);
+      c1.bindTooltip("Vùng 1: Siêu Tốc 10-15 Phút (<1.2km)", { permanent: false, direction: 'top' });
+
+      // Vùng 3km: Vùng A - Toàn nội thị Tuy Hòa
+      const c2 = L.circle(centerCoords, {
+        radius: 3500,
+        color: '#10B981',
+        weight: 1.2,
+        dashArray: '3, 5',
+        fillColor: '#10B981',
+        fillOpacity: 0.03
+      }).addTo(osmMap);
+      c2.bindTooltip("Vùng A: Nội Thị Tuy Hòa (<3.5km)", { permanent: false, direction: 'top' });
+
+      // Vùng 7km: Vùng B - Ngoại vi Phú Hòa & Bình Kiến
+      const c3 = L.circle(centerCoords, {
+        radius: 7500,
+        color: '#3B82F6',
+        weight: 1,
+        fillColor: '#3B82F6',
+        fillOpacity: 0.02
+      }).addTo(osmMap);
+      c3.bindTooltip("Vùng B: Ngoại Vi Phú Hòa & Bình Kiến (<7.5km)", { permanent: false, direction: 'top' });
+
+      geofenceCircles.push(c1, c2, c3);
+    }
+
+    // HIỂN THỊ CÁC MARKER THỢ TRÊN BẢN ĐỒ
+    function renderMapWorkerMarkers(filterCategory = 'all') {
+      // Xóa các marker cũ nếu có
+      Object.values(mapMarkers).forEach(m => osmMap.removeLayer(m));
+      mapMarkers = {};
+
+      const filtered = (filterCategory === 'all') 
+        ? workersList 
+        : workersList.filter(w => w.category === filterCategory);
+
+      document.getElementById("telemetryWorkersCount").innerText = `${filtered.length} Thợ Trực Ca`;
+
+      filtered.forEach(w => {
+        const customIcon = L.divIcon({
+          className: 'custom-radar-pin',
+          html: `
+            <div class="worker-pin-wrapper" id="pin-${w.id}">
+              <div class="worker-pin-bubble" style="background:${w.avatarBg};">
+                ${w.avatar}
+              </div>
+              <div class="worker-pin-badge"></div>
+              <div class="worker-pin-specialty-badge">${w.specialty.split('&')[0]}</div>
+            </div>
+          `,
+          iconSize: [40, 48],
+          iconAnchor: [20, 24]
+        });
+
+        const marker = L.marker([w.lat, w.lng], { icon: customIcon }).addTo(osmMap);
+        
+        // Popup chi tiết khi bấm vào thợ
+        marker.bindPopup(`
+          <div class="p-1 text-slate-900 leading-tight min-w-[220px]">
+            <div class="flex items-center gap-2 pb-2 border-b border-slate-200">
+              <div class="w-8 h-8 rounded-lg flex items-center justify-center font-black text-xs text-slate-950 shrink-0" style="background:${w.avatarBg}">
+                ${w.avatar}
+              </div>
+              <div class="min-w-0">
+                <div class="font-black text-xs text-slate-900">${w.name}</div>
+                <div class="text-[10px] text-amber-600 font-bold truncate">${w.specialty}</div>
+              </div>
+            </div>
+            
+            <div class="mt-2 space-y-1 text-[11px] text-slate-600">
+              <div>📍 <b>Vị trí:</b> ${w.street}</div>
+              <div>⚡ <b>Độ trễ có mặt:</b> <span class="text-emerald-700 font-black">~${w.etaMinutes} Phút</span> (${w.distance})</div>
+              <div>⭐ <b>Uy tín:</b> ${w.rating} / 5.0 (${w.jobs} ca sửa thành công)</div>
+            </div>
+
+            <div class="mt-2.5 pt-2 border-t border-slate-200 flex items-center justify-between gap-1.5">
+              <a href="tel:${w.phone.replace(/\./g, '')}" class="bg-red-600 hover:bg-red-700 text-white font-extrabold text-[10px] px-2.5 py-1.5 rounded-lg text-center flex items-center gap-1 transition">
+                <i class="fa-solid fa-phone"></i> ${w.phone}
+              </a>
+              <button onclick="selectWorkerForDispatch('${w.id}')" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-[10px] px-3 py-1.5 rounded-lg shadow transition">
+                ⚡ Chọn Thợ Này
+              </button>
+            </div>
+          </div>
+        `);
+
+        mapMarkers[w.id] = marker;
+      });
+    }
+
+    // ĐỊNH VỊ GPS THỰC TẾ CỦA KHÁCH HÀNG (BROWSER GEOLOCATION API)
+    function getUserLiveLocation() {
+      if (!navigator.geolocation) {
+        alert("Trình duyệt của bạn không hỗ trợ định vị GPS tự động.");
+        return;
+      }
+
+      const btn = event?.currentTarget;
+      if (btn) btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Đang bắt...`;
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const userLat = position.coords.latitude;
+          const userLng = position.coords.longitude;
+          currentUserCoords = [userLat, userLng];
+
+          // Cập nhật telemetry
+          document.getElementById("telemetryCoords").innerText = `${userLat.toFixed(4)}°N, ${userLng.toFixed(4)}°E`;
+
+          // Xóa marker cũ nếu có
+          if (userLocationMarker) osmMap.removeLayer(userLocationMarker);
+
+          const userIcon = L.divIcon({
+            className: 'custom-radar-pin',
+            html: `
+              <div class="relative flex items-center justify-center">
+                <div class="user-gps-pulse-ring"></div>
+                <div class="user-gps-dot"></div>
+              </div>
+            `,
+            iconSize: [40, 40],
+            iconAnchor: [20, 20]
+          });
+
+          userLocationMarker = L.marker([userLat, userLng], { icon: userIcon }).addTo(osmMap);
+          userLocationMarker.bindPopup(`
+            <div class="p-1 text-slate-900">
+              <div class="font-extrabold text-xs text-blue-700"><i class="fa-solid fa-person-pin"></i> VỊ TRÍ CỦA BẠN (GPS THỰC)</div>
+              <div class="text-[11px] text-slate-600 mt-0.5">Tọa độ: ${userLat.toFixed(5)}, ${userLng.toFixed(5)}</div>
+              <div class="text-[10px] text-emerald-600 font-bold mt-1">Hệ thống đang tính khoảng cách tới các thợ gần nhất...</div>
+            </div>
+          `).openPopup();
+
+          // Tính lại khoảng cách thực tế đến tất cả các thợ
+          workersList.forEach(w => {
+            const dist = calculateHaversineKm(userLat, userLng, w.lat, w.lng);
+            w.distanceKm = dist;
+            w.distance = `${dist} km`;
+            w.etaMinutes = Math.max(8, Math.round(dist * 3.5)); // Tính thời gian di chuyển
+          });
+
+          // Sắp xếp thợ gần nhất lên đầu
+          workersList.sort((a, b) => a.distanceKm - b.distanceKm);
+
+          // Cập nhật lại bản đồ và danh sách ca trực
+          drawGeofenceCircles([userLat, userLng]);
+          renderMapWorkerMarkers();
+          renderWorkersList();
+
+          // Bay mượt tới vị trí khách
+          osmMap.flyTo([userLat, userLng], 14, { duration: 1.5 });
+
+          // Điền tọa độ vào ô địa chỉ nếu khách chưa nhập chi tiết
+          const addrInput = document.getElementById("inputDispatchAddress");
+          if (addrInput && addrInput.value.includes("Số 12 Nguyễn Huệ")) {
+            addrInput.value = `Gần vị trí GPS (${userLat.toFixed(4)}, ${userLng.toFixed(4)}), TP. Tuy Hòa`;
+          }
+
+          if (btn) btn.innerHTML = `<i class="fa-solid fa-crosshairs text-emerald-400"></i> Đã Bắt GPS`;
+        },
+        (error) => {
+          console.warn("Geolocation error:", error);
+          alert("Không thể lấy tọa độ GPS tự động. Hệ thống sẽ tiếp tục sử dụng tâm Tuy Hòa làm chuẩn.");
+          if (btn) btn.innerHTML = `<i class="fa-solid fa-crosshairs text-amber-400"></i> GPS Tôi`;
+        },
+        { enableHighAccuracy: true, timeout: 8000 }
+      );
+    }
+
+    // VỀ TRUNG TÂM TUY HÒA (21/146 NGÔ GIA TỰ)
+    function recenterTuyHoa() {
+      if (!osmMap) return;
+      osmMap.flyTo(TUY_HOA_HQ, 13, { duration: 1.2 });
+      document.getElementById("telemetryCoords").innerText = "13.0882°N, 109.3086°E";
+    }
+
+    // QUÉT TẦN SỐ RADAR (SIMULATE GPS DRIFT & ĐỒNG BỘ CSDL Ổ E)
+    function triggerRadarSweep() {
+      // Mô phỏng thợ di chuyển nhẹ trên các tuyến phố
+      workersList.forEach(w => {
+        const deltaLat = (Math.random() - 0.5) * 0.002;
+        const deltaLng = (Math.random() - 0.5) * 0.002;
+        w.lat += deltaLat;
+        w.lng += deltaLng;
+
+        // Bắn cập nhật lên Backend ổ E nếu server đang chạy
+        fetch('/api/workers/location', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            workerId: w.id,
+            lat: w.lat,
+            lng: w.lng,
+            status: 'online'
+          })
+        }).catch(() => {});
+      });
+
+      // Cập nhật lại vị trí marker trên map
+      renderMapWorkerMarkers();
+      renderWorkersList();
+
+      // Hiệu ứng xoay nhanh tia radar
+      const overlay = document.getElementById("radarSweepOverlay");
+      if (overlay) {
+        overlay.classList.add("opacity-50");
+        setTimeout(() => overlay.classList.remove("opacity-50"), 1500);
+      }
+    }
+
+    // BẬT / TẮT TIA QUÉT RADAR
+    function toggleSweepBeam(isEnabled) {
+      const overlay = document.getElementById("radarSweepOverlay");
+      if (overlay) {
+        overlay.style.display = isEnabled ? 'block' : 'none';
+      }
+    }
+
+    // PHÓNG TO / THU NHỎ TOÀN BỘ KHUNG BẢN ĐỒ RADAR
+    function toggleMapExpand() {
+      const col = document.getElementById("radarConsoleCol");
+      const btn = document.getElementById("btnExpandMap");
+      const viewport = document.getElementById("mapViewportWrapper");
+
+      isMapExpanded = !isMapExpanded;
+
+      if (isMapExpanded) {
+        col.classList.remove("lg:col-span-5");
+        col.classList.add("lg:col-span-12");
+        viewport.classList.remove("h-[360px]", "sm:h-[400px]");
+        viewport.classList.add("h-[550px]");
+        btn.innerHTML = `<i class="fa-solid fa-compress"></i>`;
+        btn.title = "Thu nhỏ bản đồ";
+      } else {
+        col.classList.remove("lg:col-span-12");
+        col.classList.add("lg:col-span-5");
+        viewport.classList.remove("h-[550px]");
+        viewport.classList.add("h-[360px]", "sm:h-[400px]");
+        btn.innerHTML = `<i class="fa-solid fa-expand"></i>`;
+        btn.title = "Phóng to toàn cảnh";
+      }
+
+      // Thông báo cho Leaflet render lại kích thước khung
+      setTimeout(() => {
+        if (osmMap) osmMap.invalidateSize();
+      }, 350);
+    }
+
+    // LỌC THỢ THEO CHUYÊN MÔN TRÊN BẢN ĐỒ
+    function filterMapWorkers(category, btnElement) {
+      document.querySelectorAll(".worker-filter-pill").forEach(p => {
+        p.classList.remove("bg-amber-500", "text-slate-950", "font-black");
+        p.classList.add("bg-slate-800", "text-slate-300", "font-bold");
+      });
+      if (btnElement) {
+        btnElement.classList.add("bg-amber-500", "text-slate-950", "font-black");
+        btnElement.classList.remove("bg-slate-800", "text-slate-300");
+      }
+      renderMapWorkerMarkers(category);
+    }
+
+    // BẤM TỪ DANH SÁCH -> BAY TỚI THỢ TRÊN BẢN ĐỒ
+    function flyToWorkerFromList(workerId) {
+      const worker = workersList.find(w => w.id === workerId);
+      if (!worker || !osmMap) return;
+
+      osmMap.flyTo([worker.lat, worker.lng], 16, { duration: 1.5 });
+      setTimeout(() => {
+        if (mapMarkers[workerId]) {
+          mapMarkers[workerId].openPopup();
+        }
+      }, 1600);
+    }
+
+    // CHỌN THỢ TRỰC TIẾP TỪ BẢN ĐỒ VÀ ĐIỀN VÀO FORM ĐẶT
+    function selectWorkerForDispatch(workerId) {
+      const worker = workersList.find(w => w.id === workerId);
+      if (!worker) return;
+
+      // Gán đích danh vào Form Nhu Cầu
+      assignWorkerToRequest(worker.id, worker.name);
+
+      // Tìm gói dịch vụ tương ứng
+      let matchSrv = servicesList[0];
+      if (worker.category === 'diennuoc') matchSrv = servicesList[1];
+      else if (worker.category === 'xemay') matchSrv = servicesList[3];
+      else if (worker.category === 'nhomkinh') matchSrv = servicesList[5];
+
+      selectServiceItem(matchSrv.id, matchSrv.title, matchSrv.price);
+
+      // Điền thông tin chỉ định thợ vào ghi chú
+      const noteInput = document.getElementById("inputDispatchNotes");
+      if (noteInput) {
+        noteInput.value = `[Khách hàng chọn chỉ định]: Thợ ${worker.name} (SĐT: ${worker.phone}) - Chuyên môn: ${worker.specialty}`;
+      }
+
+      // Cuộn mượt xuống Form đặt
+      document.getElementById("sectionDemandIntakeForm")?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // KẾT NỐI REALTIME SSE VỚI BACKEND Ổ E
+    function initRealtimeSseListener() {
+      try {
+        const sse = new EventSource('/api/realtime');
+        sse.addEventListener('worker_location_update', function(e) {
+          const data = JSON.parse(e.data);
+          const w = workersList.find(x => x.id === data.id);
+          if (w) {
+            w.lat = data.lat;
+            w.lng = data.lng;
+            if (mapMarkers[w.id]) {
+              mapMarkers[w.id].setLatLng([data.lat, data.lng]);
+            }
+          }
+        });
+      } catch (err) {
+        console.log("SSE Standalone Mode:", err);
+      }
+    }
+
+    // RENDER SERVICES RADIO
+    function renderServices() {
+      const container = document.getElementById("servicesGrid");
+      container.innerHTML = servicesList.map(s => `
+        <label class="p-3.5 rounded-2xl border ${s.checked ? 'border-amber-400 bg-amber-500/10' : 'border-slate-800 bg-slate-900/80'} hover:border-amber-400/60 cursor-pointer flex items-center justify-between gap-2 transition" onclick="selectServiceItem('${s.id}', '${s.title}', ${s.price})">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <input type="radio" name="serviceRadioItem" ${s.checked ? 'checked' : ''} class="text-amber-400 accent-amber-400">
+            <div class="min-w-0">
+              <div class="font-bold text-xs text-white truncate">${s.title}</div>
+              <div class="text-[10px] text-slate-400 truncate">${s.desc}</div>
+            </div>
+          </div>
+          <div class="text-right shrink-0">
+            <div class="font-black text-amber-400 text-xs">${s.price.toLocaleString('vi-VN')}đ</div>
+            <div class="text-[9px] text-emerald-400 font-semibold">${s.warranty}</div>
+          </div>
+        </label>
+      `).join('');
+    }
+
+    function selectServiceItem(id, title, price) {
+      currentSelectedPrice = price;
+      currentSelectedTitle = title;
+      document.getElementById("displayTotalServicePrice").innerText = price.toLocaleString('vi-VN') + "đ";
+      servicesList.forEach(s => s.checked = (s.id === id));
+      renderServices();
+    }
+
+    // RENDER WORKERS SHIFT LIST
+    function renderWorkersList() {
+      const container = document.getElementById("workersShiftList");
+      if (!container) return;
+      container.innerHTML = workersList.map(w => `
+        <div class="p-3 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-amber-500/40 transition flex items-center justify-between gap-3 group">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-10 h-10 rounded-xl text-slate-950 font-black flex items-center justify-center text-xs shrink-0 shadow cursor-pointer group-hover:scale-105 transition" style="background:${w.avatarBg}" onclick="flyToWorkerFromList('${w.id}')" title="Bấm xem trên bản đồ">
+              ${w.avatar}
+            </div>
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5">
+                <span class="font-extrabold text-xs text-white hover:text-amber-400 cursor-pointer" onclick="flyToWorkerFromList('${w.id}')">${w.name}</span>
+                <span class="text-[9px] bg-emerald-500/20 text-emerald-300 font-bold px-1.5 py-0.2 rounded">Trực Ca</span>
+              </div>
+              <div class="text-[11px] text-amber-400 font-semibold truncate">${w.specialty}</div>
+              <div class="text-[10px] text-slate-400 flex items-center gap-2">
+                <span>📍 ${w.distance}</span>
+                <span>•</span>
+                <span class="text-amber-300 font-bold">★ ${w.rating}</span>
+                <span>(${w.jobs} ca)</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button onclick="openWorkerStorefrontModal('${w.id}')" title="Xem Gian Hàng Số Thợ 6K" class="bg-slate-800 hover:bg-slate-700 text-amber-300 p-2 rounded-xl text-xs transition border border-slate-700">
+              <i class="fa-solid fa-id-badge"></i>
+            </button>
+            <button onclick="flyToWorkerFromList('${w.id}')" title="Xem vị trí GPS trên Radar" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-amber-400 p-2 rounded-xl text-xs transition border border-slate-700">
+              <i class="fa-solid fa-map-location-dot"></i>
+            </button>
+            <a href="tel:${w.phone.replace(/\./g, '')}" class="bg-red-600 hover:bg-red-700 text-white font-black text-xs px-2.5 py-2 rounded-xl shadow flex items-center gap-1 transition">
+              <i class="fa-solid fa-phone"></i>
+            </a>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // RENDER 8 ICON ĐIỀU HƯỚNG NHU CẦU KHÁCH HÀNG (CÓ NÚT THỢ & GIAN HÀNG)
+    function renderDemandNavigationIcons() {
+      const container = document.getElementById("demandIconsGrid");
+      if (!container) return;
+
+      container.innerHTML = customerDemands.map(d => {
+        const isActive = (d.id === currentDemandId);
+        return `
+          <div onclick="selectDemandCategory('${d.id}', true)" id="demandCard-${d.id}" 
+               class="demand-nav-card p-2.5 sm:p-3 rounded-2xl glass-card border transition-all duration-300 cursor-pointer flex flex-col items-center text-center group relative overflow-hidden ${
+                 isActive 
+                   ? 'border-amber-400 ring-2 ring-amber-400/60 bg-gradient-to-b from-amber-500/20 to-slate-900 shadow-lg shadow-amber-500/15 -translate-y-1' 
+                   : 'border-slate-800 bg-slate-900/80 hover:border-amber-400/50 hover:-translate-y-0.5'
+               }">
+            
+            ${isActive ? `
+              <div class="absolute -top-1 -right-1 w-6 h-6 bg-amber-400 text-slate-950 rounded-bl-xl rounded-tr-lg flex items-center justify-center text-[10px] font-black shadow z-10">
+                <i class="fa-solid fa-check"></i>
+              </div>
+            ` : ''}
+
+            <!-- Icon Tròn Nổi Bật -->
+            <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center text-lg sm:text-xl mb-1.5 transition-transform duration-300 group-hover:scale-110 shadow-md ${
+              isActive ? 'bg-amber-400 text-slate-950 font-black' : 'bg-slate-800 ' + d.iconColor
+            }">
+              <i class="${d.icon}"></i>
+            </div>
+
+            <!-- Tên Nhu Cầu -->
+            <div class="font-black text-xs text-white group-hover:text-amber-400 transition leading-snug">
+              ${d.title}
+            </div>
+
+            <!-- Subtitle Mô Tả -->
+            <div class="text-[9.5px] text-slate-400 mt-0.5 line-clamp-1">
+              ${d.subtitle}
+            </div>
+
+            <!-- Micro Action Buttons: Điều hướng trực tiếp tới Thợ & Gian Hàng -->
+            <div class="w-full grid grid-cols-2 gap-1 mt-2 pt-2 border-t border-slate-800/80">
+              <button type="button" 
+                      title="Xem hồ sơ & gian hàng của thợ phụ trách nhóm ${d.title}"
+                      onclick="event.stopPropagation(); openWorkerStorefrontModal('${d.workerInfo.id}')"
+                      class="px-1 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-400 text-amber-300 hover:text-slate-950 font-extrabold text-[9px] transition flex items-center justify-center gap-1 shadow-sm">
+                <i class="fa-solid fa-user-gear"></i>
+                <span>Thợ 6K</span>
+              </button>
+              <button type="button" 
+                      title="Ghé gian hàng vật tư chính hãng trên Sàn Chợ Phiên"
+                      onclick="event.stopPropagation(); navigateToPartnerShop('${d.shopInfo.marketplaceUrl}')"
+                      class="px-1 py-1 rounded-lg bg-blue-500/20 hover:bg-blue-600 text-blue-300 hover:text-white font-extrabold text-[9px] transition flex items-center justify-center gap-1 shadow-sm">
+                <i class="fa-solid fa-shop"></i>
+                <span>Tiệm</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // CHỌN DANH MỤC NHU CẦU & CẬP NHẬT FORM THÔNG TIN + HIỂN THỊ HUB ĐIỀU HƯỚNG
+    function selectDemandCategory(demandId, shouldScroll = false) {
+      currentDemandId = demandId;
+      const d = customerDemands.find(x => x.id === demandId);
+      if (!d) return;
+
+      // 1. Cập nhật lại giao diện các icon điều hướng
+      renderDemandNavigationIcons();
+
+      // 2. Hiển thị Hub Điều Hướng Tương Ứng (Thợ & Gian Hàng Đối Tác)
+      renderDemandDestinationHub(d);
+
+      // 3. Cập nhật tiêu đề và huy hiệu của Form
+      const titleEl = document.getElementById("formDemandTitle");
+      if (titleEl) titleEl.innerText = `📝 Nhu Cầu: ${d.title}`;
+
+      const badgeEl = document.getElementById("activeDemandBadge");
+      if (badgeEl) {
+        badgeEl.className = `text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full border ${d.badgeBg}`;
+        badgeEl.innerText = d.title;
+      }
+
+      // 4. Render các triệu chứng gợi ý (Symptom Pills)
+      renderDemandSymptoms(d.symptoms);
+
+      // 5. Cập nhật giá niêm yết K3 & Thời hạn bảo hành K6
+      const priceEl = document.getElementById("displayDemandPrice");
+      if (priceEl) priceEl.innerText = d.price.toLocaleString('vi-VN') + "đ";
+
+      const warrantyEl = document.getElementById("displayDemandWarranty");
+      if (warrantyEl) warrantyEl.innerText = d.warranty;
+
+      // 6. Cập nhật bộ lọc trên Bản đồ Radar OpenStreetMap
+      filterMapWorkers(d.mapCategory);
+
+      // 7. Cuộn mượt đến Form nếu người dùng bấm từ Icon
+      if (shouldScroll) {
+        document.getElementById("sectionDemandIntakeForm")?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    // HIỂN THỊ KHU VỰC ĐIỀU HƯỚNG TƯƠNG ỨNG TỚI THỢ VÀ GIAN HÀNG
+    function renderDemandDestinationHub(d) {
+      const container = document.getElementById("demandDestinationContainer");
+      if (!container) return;
+
+      container.innerHTML = `
+        <div class="glass-card rounded-3xl p-4 sm:p-5 border border-amber-400/40 bg-gradient-to-r from-slate-900 via-slate-900/95 to-blue-950/40 shadow-2xl space-y-4">
+          
+          <!-- Thanh Tiêu Đề Điều Hướng -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+            <div class="flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-2xl bg-amber-400 text-slate-950 flex items-center justify-center text-base font-black shadow-lg">
+                <i class="${d.icon}"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h4 class="text-sm sm:text-base font-black text-white">
+                    Kết Nối Nhu Cầu: <span class="text-amber-400">${d.title}</span>
+                  </h4>
+                  <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${d.badgeBg}">
+                    ${d.warranty}
+                  </span>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-0.5">
+                  Hệ thống Đất Phú kết nối trực tiếp Thợ Chuyên Môn & Gian Hàng Cửa Hàng Vật Tư tại Tuy Hòa:
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="text-[11px] text-emerald-400 font-bold bg-emerald-500/10 px-3 py-1 rounded-xl border border-emerald-500/25 flex items-center gap-1.5 shadow-sm">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span>Thợ Live & Gian Hàng Sẵn Hàng</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Lưới 2 Thẻ: Thợ Chuyên Trách & Gian Hàng Đối Tác -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            <!-- THẺ 1: THỢ KỸ THUẬT 6K TIÊU BIỂU -->
+            <div class="bg-slate-950/80 rounded-2xl p-4 border border-slate-800 hover:border-amber-400/60 transition flex flex-col justify-between space-y-3.5 group">
+              <div class="space-y-3">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl text-slate-950 font-black text-base flex items-center justify-center shadow-lg border border-white/20" style="background:${d.workerInfo.avatarBg}">
+                      ${d.workerInfo.avatar}
+                    </div>
+                    <div>
+                      <div class="flex items-center gap-1.5">
+                        <span class="text-sm font-black text-white">${d.workerInfo.name}</span>
+                        <span class="text-[9px] font-black uppercase bg-amber-400 text-slate-950 px-1.5 py-0.5 rounded shadow">
+                          ${d.workerInfo.badge}
+                        </span>
+                      </div>
+                      <div class="text-[11px] text-amber-300 font-bold mt-0.5">${d.workerInfo.title}</div>
+                    </div>
+                  </div>
+                  <a href="tel:${d.workerInfo.phone.replace(/\./g, '')}" class="w-8 h-8 rounded-xl bg-red-600 hover:bg-red-700 text-white flex items-center justify-center text-xs shadow transition" title="Gọi Thợ Ngay">
+                    <i class="fa-solid fa-phone"></i>
+                  </a>
+                </div>
+
+                <!-- Thống số uy tín & khoảng cách -->
+                <div class="text-[11px] text-slate-300 space-y-1 bg-slate-900/90 p-2.5 rounded-xl border border-slate-800">
+                  <div class="flex items-center justify-between">
+                    <span class="text-slate-400">Đánh giá tín nhiệm:</span>
+                    <span class="font-bold text-amber-400">★ ${d.workerInfo.rating} (${d.workerInfo.completedJobs} ca hoàn thành)</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-slate-400">Vị trí trực ca:</span>
+                    <span class="font-bold text-slate-200">📍 ${d.workerInfo.distance}</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-slate-400">Cam kết có mặt:</span>
+                    <span class="font-bold text-emerald-400">⚡ ${d.workerInfo.eta}</span>
+                  </div>
+                </div>
+
+                <!-- Chuyên môn nổi bật -->
+                <div class="flex flex-wrap gap-1">
+                  ${d.workerInfo.specialties.map(sp => `
+                    <span class="text-[9.5px] px-2 py-0.5 rounded-md bg-slate-800/90 text-slate-300 border border-slate-700/80 font-medium">
+                      ✓ ${sp}
+                    </span>
+                  `).join('')}
+                </div>
+              </div>
+
+              <!-- Nút Thao Tác Thợ -->
+              <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-800/80">
+                <button type="button" onclick="openWorkerStorefrontModal('${d.workerInfo.id}')" class="bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs py-2 px-2.5 rounded-xl border border-slate-700 flex items-center justify-center gap-1.5 transition">
+                  <i class="fa-solid fa-id-badge"></i>
+                  <span>Xem Gian Hàng Thợ</span>
+                </button>
+                <button type="button" onclick="assignWorkerToRequest('${d.workerInfo.id}', '${d.workerInfo.name}')" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs py-2 px-2.5 rounded-xl shadow flex items-center justify-center gap-1.5 transition">
+                  <i class="fa-solid fa-circle-check"></i>
+                  <span>Gán Thợ Này Vào Đơn</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- THẺ 2: GIAN HÀNG ĐỐI TÁC VẬT TƯ & THIẾT BỊ 6K -->
+            <div class="bg-slate-950/80 rounded-2xl p-4 border border-slate-800 hover:border-blue-400/60 transition flex flex-col justify-between space-y-3.5 group">
+              <div class="space-y-3">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-600/20 text-blue-400 border border-blue-500/40 font-black text-xl flex items-center justify-center shadow-lg">
+                      <i class="fa-solid fa-shop"></i>
+                    </div>
+                    <div>
+                      <div class="flex items-center gap-1.5">
+                        <span class="text-sm font-black text-white">${d.shopInfo.name}</span>
+                      </div>
+                      <div class="text-[10px] text-blue-300 font-bold mt-0.5">
+                        <i class="fa-solid fa-location-dot"></i> ${d.shopInfo.address}
+                      </div>
+                    </div>
+                  </div>
+                  <span class="text-[9px] font-black uppercase bg-blue-600/40 text-blue-200 border border-blue-500/40 px-2 py-0.5 rounded-md shrink-0">
+                    ${d.shopInfo.badge}
+                  </span>
+                </div>
+
+                <!-- Vật tư chính hãng sẵn hàng -->
+                <div class="text-[11px] text-slate-300 space-y-1.5 bg-slate-900/90 p-2.5 rounded-xl border border-slate-800">
+                  <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider flex items-center justify-between">
+                    <span>📦 Vật tư chính hãng sẵn hàng:</span>
+                    <span class="text-amber-400 font-semibold">Niêm yết K3</span>
+                  </div>
+                  ${d.shopInfo.featuredItems.map(item => `
+                    <div class="flex items-center justify-between text-[10.5px]">
+                      <span class="text-slate-200 truncate pr-2">• ${item.name}</span>
+                      <span class="font-mono font-bold text-amber-400 shrink-0">${item.price}</span>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+
+              <!-- Nút Thao Tác Gian Hàng -->
+              <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-800/80">
+                <a href="${d.shopInfo.marketplaceUrl}" class="bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs py-2 px-2.5 rounded-xl shadow flex items-center justify-center gap-1.5 transition">
+                  <i class="fa-solid fa-store"></i>
+                  <span>Ghé Gian Hàng Sàn</span>
+                </a>
+                <button type="button" onclick="selectDemandItemPart('${d.shopInfo.featuredItems[0].name.replace(/'/g, "\\'")}')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs py-2 px-2.5 rounded-xl border border-slate-700 flex items-center justify-center gap-1.5 transition">
+                  <i class="fa-solid fa-cart-plus text-amber-400"></i>
+                  <span>Kèm Vật Tư Vào Đơn</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      `;
+    }
+
+    // MODAL VÀ THAO TÁC GIAN HÀNG THỢ
+    let currentModalWorkerData = null;
+    let explicitlyAssignedWorker = null;
+
+    function openWorkerStorefrontModal(workerId) {
+      let w = null;
+      for (const d of customerDemands) {
+        if (d.workerInfo && d.workerInfo.id === workerId) {
+          w = d.workerInfo;
+          break;
+        }
+      }
+      if (!w) {
+        const fallback = workersList.find(x => x.id === workerId) || workersList[0];
+        w = {
+          id: fallback.id,
+          name: fallback.name,
+          avatar: fallback.avatar,
+          avatarBg: fallback.avatarBg,
+          title: fallback.specialty,
+          badge: "THỢ VÀNG 6K",
+          phone: fallback.phone,
+          rating: fallback.rating,
+          completedJobs: fallback.jobs,
+          distance: fallback.distance,
+          eta: fallback.etaMinutes + " phút",
+          bio: "Thợ kỹ thuật thực chiến thuộc mạng lưới cứu hộ Đất Phú 6K. Cam kết đúng hẹn, đúng giá niêm yết K3 và bảo hành QR chu đáo.",
+          specialties: [fallback.specialty, "Cứu hộ khẩn cấp 15P", "Bảo hành QR"],
+          pricing: [
+            { name: "Công khảo sát & kiểm tra tại nhà", price: "50.000đ" },
+            { name: fallback.specialty, price: "250.000đ - 500.000đ" }
+          ],
+          storefrontUrl: `./tho_gian_hang.html?workerId=${fallback.id}&view=preview`
+        };
+      }
+
+      currentModalWorkerData = w;
+
+      const av = document.getElementById("modalWorkerAvatar");
+      if (av) {
+        av.innerText = w.avatar;
+        av.style.backgroundColor = w.avatarBg;
+      }
+      document.getElementById("modalWorkerName").innerText = w.name;
+      document.getElementById("modalWorkerBadge").innerText = w.badge;
+      document.getElementById("modalWorkerSpecialty").innerText = w.title;
+      document.getElementById("modalWorkerStats").innerHTML = `<span>★ ${w.rating} (${w.completedJobs} ca)</span> <span>•</span> <span>📍 ${w.distance}</span>`;
+      document.getElementById("modalWorkerBio").innerText = w.bio;
+      
+      const callBtn = document.getElementById("modalWorkerCallBtn");
+      if (callBtn) callBtn.href = `tel:${w.phone.replace(/\./g, '')}`;
+
+      const fullPageBtn = document.getElementById("modalWorkerFullPageBtn");
+      if (fullPageBtn) fullPageBtn.href = `./tho_gian_hang.html?workerId=${w.id}&view=preview`;
+
+      // Render bảng giá
+      const pricingContainer = document.getElementById("modalWorkerPricingList");
+      if (pricingContainer) {
+        pricingContainer.innerHTML = (w.pricing || []).map(p => `
+          <div class="flex items-center justify-between text-xs py-1 border-b border-slate-800/60 last:border-0">
+            <span class="text-slate-200">• ${p.name}</span>
+            <span class="font-mono font-bold text-amber-400">${p.price}</span>
+          </div>
+        `).join('');
+      }
+
+      // Render ảnh dự án thực tế
+      const portfolioContainer = document.getElementById("modalWorkerPortfolioGrid");
+      if (portfolioContainer) {
+        portfolioContainer.innerHTML = `
+          <div class="rounded-xl overflow-hidden bg-slate-950 border border-slate-800">
+            <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=400&q=80" class="w-full h-24 object-cover">
+            <div class="p-2">
+              <div class="font-bold text-[11px] text-white truncate">Dự án hoàn thành tại Tuy Hòa</div>
+              <div class="text-[9.5px] text-amber-400">📍 Đường Lê Lợi, P.5</div>
+            </div>
+          </div>
+          <div class="rounded-xl overflow-hidden bg-slate-950 border border-slate-800">
+            <img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=400&q=80" class="w-full h-24 object-cover">
+            <div class="p-2">
+              <div class="font-bold text-[11px] text-white truncate">Kiểm định và nghiệm thu K5</div>
+              <div class="text-[9.5px] text-amber-400">📍 Hùng Vương, P.7</div>
+            </div>
+          </div>
+        `;
+      }
+
+      document.getElementById("workerStorefrontModal")?.classList.remove("hidden");
+    }
+
+    function closeWorkerStorefrontModal() {
+      document.getElementById("workerStorefrontModal")?.classList.add("hidden");
+    }
+
+    function assignWorkerToRequest(workerId, workerName) {
+      explicitlyAssignedWorker = { id: workerId, name: workerName };
+      
+      const badge = document.getElementById("assignedWorkerBadge");
+      const text = document.getElementById("assignedWorkerText");
+      if (badge && text) {
+        text.innerText = `Thợ: ${workerName}`;
+        badge.classList.remove("hidden");
+      }
+
+      // Thêm thông báo nhẹ và cuộn đến form
+      const notesEl = document.getElementById("inputDemandNotes");
+      if (notesEl && !notesEl.value.includes(workerName)) {
+        notesEl.value = `[Ưu tiên thợ: ${workerName}] ` + notesEl.value;
+      }
+
+      document.getElementById("sectionDemandIntakeForm")?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function assignWorkerFromModal() {
+      if (currentModalWorkerData) {
+        assignWorkerToRequest(currentModalWorkerData.id, currentModalWorkerData.name);
+      }
+      closeWorkerStorefrontModal();
+    }
+
+    function selectDemandItemPart(partName) {
+      const notesEl = document.getElementById("inputDemandNotes");
+      if (notesEl) {
+        if (!notesEl.value.includes(partName)) {
+          notesEl.value = notesEl.value ? (notesEl.value + ` + Kèm vật tư: ${partName}`) : `Kèm vật tư: ${partName}`;
+        }
+      }
+      document.getElementById("sectionDemandIntakeForm")?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function navigateToPartnerShop(url) {
+      window.location.href = url;
+    }
+
+    // RENDER DANH SÁCH TRIỆU CHỨNG GỢI Ý (SYMPTOM PILLS)
+    function renderDemandSymptoms(symptoms) {
+      const container = document.getElementById("demandSymptomsPills");
+      if (!container) return;
+
+      selectedSymptomsList = [];
+      container.innerHTML = symptoms.map((s, idx) => `
+        <button type="button" onclick="toggleSymptomPill('${s.replace(/'/g, "\\'")}', this)" 
+                class="symptom-pill px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700/80 hover:border-amber-400 text-slate-300 text-[11px] font-medium transition flex items-center gap-1.5 shadow-sm">
+          <i class="fa-solid fa-plus text-[9px] text-amber-400"></i>
+          <span>${s}</span>
+        </button>
+      `).join('');
+    }
+
+    // TOGGLE CHỌN / BỎ CHỌN TRIỆU CHỨNG ĐỂ TỰ ĐIỀN VÀO GHI CHÚ
+    function toggleSymptomPill(symptomText, pillEl) {
+      const idx = selectedSymptomsList.indexOf(symptomText);
+      if (idx !== -1) {
+        // Đã có -> Bỏ chọn
+        selectedSymptomsList.splice(idx, 1);
+        pillEl.classList.remove("bg-amber-400", "text-slate-950", "border-amber-400", "font-bold");
+        pillEl.classList.add("bg-slate-900", "text-slate-300", "border-slate-700/80");
+        const icon = pillEl.querySelector("i");
+        if (icon) icon.className = "fa-solid fa-plus text-[9px] text-amber-400";
+      } else {
+        // Chưa có -> Chọn
+        selectedSymptomsList.push(symptomText);
+        pillEl.classList.remove("bg-slate-900", "text-slate-300", "border-slate-700/80");
+        pillEl.classList.add("bg-amber-400", "text-slate-950", "border-amber-400", "font-bold");
+        const icon = pillEl.querySelector("i");
+        if (icon) icon.className = "fa-solid fa-check text-[9px] text-slate-950";
+      }
+
+      // Nối danh sách triệu chứng vào textarea ghi chú
+      const notesEl = document.getElementById("inputDemandNotes");
+      if (notesEl) {
+        if (selectedSymptomsList.length > 0) {
+          notesEl.value = `Triệu chứng gặp phải:\n- ` + selectedSymptomsList.join(`\n- `);
+        } else {
+          notesEl.value = "";
+        }
+      }
+    }
+
+    // CHỌN MỨC ĐỘ KHẨN CẤP
+    function selectUrgency(level, labelEl) {
+      currentUrgencyLevel = level;
+      document.querySelectorAll(".urgency-opt").forEach(el => {
+        el.classList.remove("border-red-500/60", "bg-red-950/30", "border-amber-500/60", "bg-amber-950/30", "border-blue-500/60", "bg-blue-950/30", "selected");
+        el.classList.add("border-slate-800", "bg-slate-900/80");
+      });
+
+      labelEl.classList.remove("border-slate-800", "bg-slate-900/80");
+      if (level === 'urgent_15m') {
+        labelEl.classList.add("border-red-500/60", "bg-red-950/30", "selected");
+      } else if (level === 'today_2h') {
+        labelEl.classList.add("border-amber-500/60", "bg-amber-950/30", "selected");
+      } else {
+        labelEl.classList.add("border-blue-500/60", "bg-blue-950/30", "selected");
+      }
+    }
+
+    // TẢI ẢNH HIỆN TRƯỜNG & LƯU VÀO Ổ E (E:\datphu-onebase\data\storage\images)
+    function handleDemandPhotoUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        currentUploadedPhotoBase64 = e.target.result;
+        
+        // Hiển thị preview
+        const previewBox = document.getElementById("demandPhotoPreviewBox");
+        const previewImg = document.getElementById("demandPhotoPreviewImg");
+        const previewName = document.getElementById("demandPhotoPreviewName");
+        if (previewBox && previewImg) {
+          previewImg.src = currentUploadedPhotoBase64;
+          if (previewName) previewName.innerText = file.name;
+          previewBox.classList.remove("hidden");
+        }
+
+        // Tự động đẩy lên server ổ E
+        fetch('/api/storage/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            base64Data: currentUploadedPhotoBase64,
+            fileName: 'hientruong_' + Date.now() + '_' + file.name.replace(/\s+/g, '_'),
+            fileType: 'image'
+          })
+        }).catch(err => console.log("Lưu ảnh offline:", err));
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeDemandPhoto() {
+      currentUploadedPhotoBase64 = null;
+      document.getElementById("demandPhotoPreviewBox")?.classList.add("hidden");
+      document.getElementById("inputDemandPhoto").value = "";
+    }
+
+    // ĐIỀN ĐỊA CHỈ TỰ ĐỘNG TỪ TỌA ĐỘ GPS KHÁCH HÀNG
+    function autoFillAddressFromGps() {
+      if (currentUserCoords) {
+        const addrInput = document.getElementById("inputDemandAddress");
+        if (addrInput) {
+          addrInput.value = `Gần vị trí GPS (${currentUserCoords[0].toFixed(4)}°N, ${currentUserCoords[1].toFixed(4)}°E), TP. Tuy Hòa`;
+          addrInput.classList.add("border-amber-400");
+          setTimeout(() => addrInput.classList.remove("border-amber-400"), 1500);
+        }
+      } else {
+        getUserLiveLocation();
+      }
+    }
+
+    // XỬ LÝ PHÁT LỆNH ĐIỀU PHỐI TỪ FORM THÔNG TIN NHU CẦU
+    function handleExecuteDemandSubmit() {
+      const phone = document.getElementById("inputDemandPhone").value.trim();
+      const address = document.getElementById("inputDemandAddress").value.trim();
+      const customerName = document.getElementById("inputDemandCustomerName").value.trim();
+      const notes = document.getElementById("inputDemandNotes").value.trim();
+
+      if (!phone || phone.length < 9) {
+        alert("Vui lòng nhập Số điện thoại liên hệ để thợ nhận đơn và gọi xác nhận!");
+        document.getElementById("inputDemandPhone").focus();
+        return;
+      }
+      if (!address) {
+        alert("Vui lòng nhập Địa chỉ nơi cần thợ tới cứu hộ!");
+        document.getElementById("inputDemandAddress").focus();
+        return;
+      }
+
+      const d = customerDemands.find(x => x.id === currentDemandId) || customerDemands[0];
+      const demandCode = "NC-" + Math.floor(100000 + Math.random() * 900000);
+      const randomOtp = "6821";
+
+      // Tìm thợ tương ứng (ưu tiên thợ được gán đích danh)
+      const assignedWorker = explicitlyAssignedWorker 
+        ? (workersList.find(w => w.id === explicitlyAssignedWorker.id) || { id: explicitlyAssignedWorker.id, name: explicitlyAssignedWorker.name, phone: '0977.334.455', distance: 'Khu vực Tuy Hòa' })
+        : (workersList.find(w => w.id === d.defaultWorkerId) || workersList[0]);
+
+      // Đẩy vào CSDL ổ E (Backend http://localhost:3456/api/orders)
+      fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: demandCode,
+          shopId: "datphu-kythuat",
+          customerName: customerName || ("Khách Hàng " + phone),
+          phone: phone,
+          address: address,
+          demandCategory: d.title,
+          urgency: currentUrgencyLevel,
+          items: [{
+            name: `${d.title} (${d.subtitle})`,
+            qty: 1,
+            price: d.price,
+            notes: notes,
+            photoAttached: !!currentUploadedPhotoBase64
+          }],
+          amount: d.price,
+          status: "dispatched_15p",
+          paymentMethod: "VietQR_OTP_6K",
+          otp: randomOtp,
+          assignedWorker: {
+            id: assignedWorker.id,
+            name: assignedWorker.name,
+            phone: assignedWorker.phone
+          }
+        })
+      }).catch(err => console.log(err));
+
+      // Kích hoạt radar quét trên bản đồ OpenStreetMap
+      triggerRadarSweep();
+      flyToWorkerFromList(assignedWorker.id);
+
+      // Điền thông tin vào Modal Xác Nhận
+      document.getElementById("modalDemandCode").innerText = demandCode;
+      document.getElementById("modalDemandCategory").innerText = `${d.title} (${d.subtitle})`;
+      document.getElementById("modalDemandWorker").innerText = `${assignedWorker.name} (${assignedWorker.phone}) - ${assignedWorker.distance}`;
+      document.getElementById("modalDemandPrice").innerText = d.price.toLocaleString('vi-VN') + "đ";
+      document.getElementById("modalDemandOtp").innerText = randomOtp;
+
+      // Hiện Modal Xác Nhận K5
+      document.getElementById("demandConfirmModal")?.classList.remove("hidden");
+    }
+
+    function closeDemandConfirmModal() {
+      document.getElementById("demandConfirmModal")?.classList.add("hidden");
+      // Cuộn lên xem bản đồ radar
+      document.getElementById("osmRadarMap")?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // RENDER PRICE CATALOG CARDS
+    function renderPriceCards() {
+      const container = document.getElementById("priceCatalogCards");
+      const groups = [
+        {
+          title: "❄️ Cơ Điện Lạnh & Gia Dụng",
+          items: [
+            { name: "Vệ sinh máy lạnh treo tường", price: "150.000đ" },
+            { name: "Tháo lắp máy lạnh 1 bộ", price: "500.000đ" },
+            { name: "Nạp gas bổ sung R32/R410A", price: "250.000đ" },
+            { name: "Sửa máy giặt không vắt / kêu to", price: "280.000đ" }
+          ]
+        },
+        {
+          title: "⚡ Điện Dân Dụng & Nước",
+          items: [
+            { name: "Khắc phục chập điện âm tường", price: "300.000đ" },
+            { name: "Lắp phao điện tự động chống giật", price: "350.000đ" },
+            { name: "Thông nghẹt bồn cầu / lavabo", price: "250.000đ" },
+            { name: "Thay mới cụm máy bơm tăng áp", price: "220.000đ" }
+          ]
+        },
+        {
+          title: "🛵 Kiểm Định & Cải Tạo Nhà",
+          items: [
+            { name: "Kiểm định xe máy cũ (18 mục)", price: "200.000đ" },
+            { name: "Thay ổ khóa tay gạt / vân tay", price: "180.000đ" },
+            { name: "Sửa cửa nhôm xệ, rít ray", price: "150.000đ" },
+            { name: "Đóng dấu tọa độ ảnh Geostamp K4", price: "Miễn Phí" }
+          ]
+        }
+      ];
+
+      container.innerHTML = groups.map(g => `
+        <div class="bg-slate-900/90 rounded-2xl p-4 border border-slate-800 space-y-3">
+          <div class="font-extrabold text-sm text-amber-400 pb-2 border-b border-slate-800">${g.title}</div>
+          <div class="space-y-2 text-xs">
+            ${g.items.map(it => `
+              <div class="flex items-center justify-between text-slate-300">
+                <span>${it.name}</span>
+                <span class="font-black text-white">${it.price}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // XỬ LÝ PHÁT LỆNH ĐIỀU PHỐI
+    function handleExecuteDispatch() {
+      const phone = document.getElementById("inputDispatchPhone").value.trim();
+      const address = document.getElementById("inputDispatchAddress").value.trim();
+      const notes = document.getElementById("inputDispatchNotes").value.trim();
+
+      if (!phone || phone.length < 9) {
+        alert("Vui lòng nhập Số điện thoại liên hệ để thợ nhận đơn và gọi xác nhận!");
+        return;
+      }
+      if (!address) {
+        alert("Vui lòng nhập Địa chỉ nơi cần thợ tới cứu hộ!");
+        return;
+      }
+
+      const reqCode = "REQ-" + Math.floor(100000 + Math.random() * 900000);
+      const randomOtp = "6821";
+
+      // Đẩy vào CSDL ổ E (Backend http://localhost:3456/api/orders)
+      fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: reqCode,
+          shopId: "datphu-kythuat",
+          customerName: "Khách Cứu Hộ " + phone,
+          phone: phone,
+          address: address,
+          items: [{ name: currentSelectedTitle, qty: 1, price: currentSelectedPrice, notes }],
+          amount: currentSelectedPrice,
+          status: "dispatched_15p",
+          paymentMethod: "VietQR_OTP_6K"
+        })
+      }).catch(err => console.log(err));
+
+      alert(`⚡ LỆNH CỨU HỘ KỸ THUẬT ĐÃ PHÁT THÀNH CÔNG!\n\n` +
+        `• Mã điều phối: ${reqCode}\n` +
+        `• Dịch vụ: ${currentSelectedTitle}\n` +
+        `• Giá niêm yết K3: ${currentSelectedPrice.toLocaleString('vi-VN')}đ\n` +
+        `• Thợ tiếp nhận: Nguyễn Văn Phú (Cách 1.8km)\n` +
+        `• Cam kết có mặt tại: ${address} trong 15–20 phút\n` +
+        `• MÃ OTP NGHIỆM THU CỦA BẠN: [ ${randomOtp} ]\n\n` +
+        `(Quý khách chỉ đọc mã OTP cho thợ sau khi thợ đã hoàn thành công việc và kiểm tra máy móc chạy tốt!)`
+      );
+    }
+
+    // BIẾN QUẢN LÝ ĐÁNH GIÁ VÀ KHIẾU NẠI
+    let currentRatingStars = 5;
+
+    function openWorkerRatingModal() {
+      document.getElementById("workerRatingModal")?.classList.remove("hidden");
+    }
+
+    function closeWorkerRatingModal() {
+      document.getElementById("workerRatingModal")?.classList.add("hidden");
+    }
+
+    function setStarRating(stars) {
+      currentRatingStars = stars;
+      const starIcons = document.querySelectorAll("#starRatingContainer .star-btn");
+      starIcons.forEach((el, idx) => {
+        if (idx < stars) {
+          el.className = "fa-solid fa-star star-btn active text-amber-400";
+        } else {
+          el.className = "fa-regular fa-star star-btn text-slate-600";
+        }
+      });
+      const textEl = document.getElementById("starRatingText");
+      if (textEl) {
+        if (stars === 5) textEl.innerText = "5.0 / 5.0 — Rất Hài Lòng (Chuẩn Thợ Vàng 6K)";
+        else if (stars === 4) textEl.innerText = "4.0 / 5.0 — Hài Lòng (Thợ Bạc 6K)";
+        else if (stars === 3) textEl.innerText = "3.0 / 5.0 — Tạm Được";
+        else textEl.innerText = `${stars}.0 / 5.0 — Cần Cải Thiện Tay Nghề`;
+      }
+    }
+
+    function toggleRatingPill(btn) {
+      if (btn.classList.contains("active")) {
+        btn.classList.remove("active", "bg-amber-400", "text-slate-950", "font-bold");
+        btn.classList.add("bg-slate-800", "text-slate-300");
+      } else {
+        btn.classList.add("active", "bg-amber-400", "text-slate-950", "font-bold");
+        btn.classList.remove("bg-slate-800", "text-slate-300");
+      }
+    }
+
+    function submitWorkerRating() {
+      const activePills = Array.from(document.querySelectorAll(".rating-feedback-pill.active")).map(b => b.innerText.trim());
+      const comment = document.getElementById("ratingCommentInput")?.value.trim() || "";
+
+      fetch('/api/workers/rating', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          workerId: "w_01",
+          orderId: "REQ-6821",
+          rating: currentRatingStars,
+          feedbackPills: activePills,
+          comment: comment
+        })
+      }).catch(err => console.log(err));
+
+      closeWorkerRatingModal();
+      alert(`⭐ CẢM ƠN QUÝ KHÁCH ĐÃ ĐÁNH GIÁ ${currentRatingStars} SAO!\n\n` +
+        `• Thợ: Nguyễn Văn Phú\n` +
+        `• Đánh giá đã được ghi nhận vào Hồ sơ thợ trên ổ E.\n` +
+        `• Mã QR Bảo Hành K6 (6 Tháng) của quý khách đã có hiệu lực trên toàn tỉnh Phú Yên!`
+      );
+    }
+
+    function openDisputeModal() {
+      document.getElementById("disputeModal")?.classList.remove("hidden");
+    }
+
+    function closeDisputeModal() {
+      document.getElementById("disputeModal")?.classList.add("hidden");
+    }
+
+    function submitDisputeEscrow() {
+      const reason = document.getElementById("disputeReasonSelect")?.value;
+      const phone = document.getElementById("disputePhoneInput")?.value.trim();
+      const desc = document.getElementById("disputeDescInput")?.value.trim();
+
+      if (!desc) {
+        alert("Vui lòng mô tả sự cố gặp phải để Thợ Trưởng Nhóm đối soát!");
+        document.getElementById("disputeDescInput")?.focus();
+        return;
+      }
+
+      fetch('/api/disputes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: "REQ-6821",
+          workerId: "w_01",
+          customerPhone: phone,
+          reason: reason,
+          description: desc
+        })
+      }).catch(err => console.log(err));
+
+      closeDisputeModal();
+      alert(`⚠️ ĐÃ TIẾP NHẬN KHIẾU NẠI & PHONG TỎA VÍ THỢ (ESCROW LOCK 24H)!\n\n` +
+        `• Hệ thống đã tạm giữ 95% tiền trong ví thợ.\n` +
+        `• Thợ Trưởng Nhóm Tuy Hòa sẽ gọi cho bạn qua số ${phone} trong vòng 15 phút.\n` +
+        `• Nếu thợ có sai phạm, Công ty Đất Phú hoàn tiền 100% qua VietQR (VCB 0751000025858)!`
+      );
+    }
+
+    function verifyOtpK5() {
+      const otp = document.getElementById("demoOtpInput").value.trim();
+      if (otp !== "6821") {
+        alert("Mã OTP chưa chính xác! Mã đúng là 6821");
+        return;
+      }
+      document.getElementById("otpSuccessAlert").classList.remove("hidden");
+    }
+
+    // INIT
+    window.onload = function() {
+      renderDemandNavigationIcons();
+
+      // Kiểm tra tham số URL (?demand=...)
+      const urlParams = new URLSearchParams(window.location.search);
+      const reqDemand = urlParams.get('demand');
+      if (reqDemand && customerDemands.some(d => d.id === reqDemand)) {
+        selectDemandCategory(reqDemand, false);
+      } else {
+        selectDemandCategory('dienlanh', false);
+      }
+
+      renderServices();
+      renderWorkersList();
+      renderPriceCards();
+      setTimeout(initOsmRadarMap, 200);
+    };
+  </script>
+</body>
+</html>

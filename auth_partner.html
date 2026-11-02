@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1B2A6B">
+  <link rel="icon" href="./logo_datphu.jpg">
+  <title>Cổng Đăng Ký & Đăng Nhập Đối Tác: Chủ Gian Hàng & Thợ 6K — Đất Phú OneBase</title>
+  
+  <!-- Tailwind CSS & Font Awesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --dp-red: #D32027;
+      --dp-blue: #1B2A6B;
+      --dp-amber: #F59E0B;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #0b1120;
+      color: #f8fafc;
+    }
+    .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .skill-pill.selected {
+      background-color: #f59e0b !important;
+      color: #0b1120 !important;
+      font-weight: 800 !important;
+      border-color: #f59e0b !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between py-6 px-4">
+
+  <!-- ================= HEADER CHÍNH ================= -->
+  <div class="max-w-xl mx-auto w-full text-center space-y-2 mb-4">
+    <a href="./ecommerce_marketplace.html" class="inline-flex items-center gap-2.5">
+      <div class="w-12 h-12 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center font-black text-2xl shadow-lg shadow-amber-500/20">
+        <i class="fa-solid fa-handshake"></i>
+      </div>
+      <div class="text-left">
+        <div class="text-base sm:text-lg font-black text-white tracking-tight">ĐẤT PHÚ PARTNER PORTAL</div>
+        <div class="text-[10px] text-amber-400 font-bold uppercase tracking-wider">CỔNG ĐỐI TÁC KINH DOANH & KỸ THUẬT 6K</div>
+      </div>
+    </a>
+    <p class="text-xs text-slate-400">
+      Dành cho <b>Chủ Gian Hàng Chợ Phiên</b> và <b>Thợ Kỹ Thuật Bản Địa</b> tại Phú Yên
+    </p>
+  </div>
+
+  <!-- ================= KHUNG CHÍNH (AUTH CONTAINER) ================= -->
+  <main class="max-w-xl mx-auto w-full glass-card rounded-3xl p-6 sm:p-8 border border-slate-700/80 shadow-2xl space-y-6">
+    
+    <!-- 1. CHỌN VAI TRÒ ĐỐI TÁC (CHỦ GIAN HÀNG VS THỢ 6K) -->
+    <div class="grid grid-cols-2 gap-2 bg-slate-950 p-1.5 rounded-2xl border border-slate-800">
+      <button type="button" onclick="selectRole('merchant')" id="roleBtn-merchant" class="role-btn py-2.5 rounded-xl text-xs font-black transition flex items-center justify-center gap-2 bg-amber-400 text-slate-950 shadow">
+        <i class="fa-solid fa-store"></i> Chủ Gian Hàng
+      </button>
+      <button type="button" onclick="selectRole('worker')" id="roleBtn-worker" class="role-btn py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 text-slate-400 hover:text-white">
+        <i class="fa-solid fa-wrench"></i> Thợ Kỹ Thuật 6K
+      </button>
+    </div>
+
+    <!-- 2. TOGGLE ĐĂNG NHẬP VS ĐĂNG KÝ MỚI -->
+    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+      <div>
+        <h2 id="formMainTitle" class="text-base sm:text-lg font-black text-white">
+          🔐 Đăng Nhập Gian Hàng Số
+        </h2>
+        <p id="formSubTitle" class="text-xs text-slate-400">
+          Quản lý đơn hàng, kho ảnh và nhận thanh toán VietQR
+        </p>
+      </div>
+      <div class="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 text-[11px]">
+        <button type="button" onclick="setAuthMode('login')" id="modeBtn-login" class="px-3 py-1 rounded-lg font-black bg-blue-600 text-white transition">
+          Đăng Nhập
+        </button>
+        <button type="button" onclick="setAuthMode('register')" id="modeBtn-register" class="px-3 py-1 rounded-lg font-bold text-slate-400 hover:text-white transition">
+          Đăng Ký
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= FORM ĐĂNG NHẬP / ĐĂNG KÝ ================= -->
+    <form id="partnerAuthForm" onsubmit="handlePartnerAuthSubmit(event)" class="space-y-4 text-xs">
+      
+      <!-- CÁC TRƯỜNG ĐẶC THÙ KHI ĐĂNG KÝ CHỦ GIAN HÀNG -->
+      <div id="merchantRegisterFields" class="hidden space-y-3.5">
+        <div>
+          <label class="font-bold text-slate-300 block mb-1">Tên gian hàng / Thương hiệu kinh doanh <span class="text-red-400">*</span></label>
+          <input type="text" id="regStoreName" placeholder="VD: Đặc Sản Xứ Nẫu Chị Ba, Gara Xe Máy 78 Nam Tiến..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 font-bold text-white text-sm focus:outline-none focus:border-amber-400">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="font-bold text-slate-300 block mb-1">Chủ hộ / Đại diện pháp lý <span class="text-red-400">*</span></label>
+            <input type="text" id="regMerchantOwnerName" placeholder="Họ và tên chủ tiệm..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white">
+          </div>
+          <div>
+            <label class="font-bold text-slate-300 block mb-1">Ngành hàng đăng ký <span class="text-red-400">*</span></label>
+            <select id="regMerchantCategory" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 font-bold text-amber-400">
+              <option value="ocop">🥩 Đặc Sản OCOP Phú Yên</option>
+              <option value="docu_sach">📚 Sách Cũ & Đồ Cũ 6K</option>
+              <option value="xecu">🛵 Chợ Xe Máy Cũ Biển 78</option>
+              <option value="suata">🍼 Sữa Tã Mẹ & Bé</option>
+              <option value="chay">🪷 Ẩm Thực Chay Thanh Tịnh</option>
+              <option value="kythuat">🛠️ Cửa Hàng Vật Tư & Kỹ Thuật</option>
+              <option value="ketoan">🧾 Kế Toán Thuế & Phần Mềm</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-300 block mb-1">Địa chỉ cửa hàng / Showroom tại Phú Yên <span class="text-red-400">*</span></label>
+          <input type="text" id="regMerchantAddress" placeholder="Số nhà, tên đường, phường/xã, TP. Tuy Hòa..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="font-bold text-slate-300 block mb-1">Số tài khoản ngân hàng nhận tiền *</label>
+            <input type="text" id="regMerchantBankAccount" placeholder="Số tài khoản VCB, BIDV..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 font-mono font-bold text-amber-400">
+          </div>
+          <div>
+            <label class="font-bold text-slate-300 block mb-1">Tên ngân hàng *</label>
+            <input type="text" id="regMerchantBankName" value="Vietcombank (VCB)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-slate-300">
+          </div>
+        </div>
+      </div>
+
+      <!-- CÁC TRƯỜNG ĐẶC THÙ KHI ĐĂNG KÝ THỢ KỸ THUẬT 6K -->
+      <div id="workerRegisterFields" class="hidden space-y-3.5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="font-bold text-slate-300 block mb-1">Họ và tên thợ kỹ thuật <span class="text-red-400">*</span></label>
+            <input type="text" id="regWorkerFullName" placeholder="VD: Nguyễn Văn Phú..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 font-bold text-white text-sm">
+          </div>
+          <div>
+            <label class="font-bold text-slate-300 block mb-1">Khu vực nhận ca trực chính <span class="text-red-400">*</span></label>
+            <select id="regWorkerDistrict" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 font-bold text-amber-400">
+              <option value="TP. Tuy Hòa">TP. Tuy Hòa (P.1 - P.9, Phú Đông, Phú Thạnh)</option>
+              <option value="Huyện Phú Hòa">Huyện Phú Hòa (Hòa Thắng, Hòa Định...)</option>
+              <option value="Thị xã Đông Hòa">Thị xã Đông Hòa (Hòa Hiệp, Hòa Vinh...)</option>
+              <option value="Huyện Tuy An">Huyện Tuy An (Chí Thạnh, An Dân...)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="font-bold text-slate-300 block mb-1.5">
+            Lĩnh vực chuyên môn chính <span class="text-red-400">*</span> (Bấm chọn các kỹ năng bạn làm tốt):
+          </label>
+          <div class="flex flex-wrap gap-1.5" id="workerSkillsPills">
+            <button type="button" onclick="toggleSkillPill(this, 'Điện Lạnh Inverter')" class="skill-pill selected px-2.5 py-1.5 rounded-xl border border-slate-700 bg-slate-900 text-slate-300 text-[11px] transition">
+              ❄️ Điện Lạnh Inverter
+            </button>
+            <button type="button" onclick="toggleSkillPill(this, 'Điện Dân Dụng')" class="skill-pill px-2.5 py-1.5 rounded-xl border border-slate-700 bg-slate-900 text-slate-300 text-[11px] transition">
+              ⚡ Điện Dân Dụng & Phao Tự Động
+            </button>
+            <button type="button" onclick="toggleSkillPill(this, 'Cấp Thoát Nước')" class="skill-pill px-2.5 py-1.5 rounded-xl border border-slate-700 bg-slate-900 text-slate-300 text-[11px] transition">
+              🚰 Thông Cầu Cống & Ống Nước
+            </button>
+            <button type="button" onclick="toggleSkillPill(this, 'Kiểm Định Xe Cũ 78')" class="skill-pill px-2.5 py-1.5 rounded-xl border border-slate-700 bg-slate-900 text-slate-300 text-[11px] transition">
+              🛵 Sửa Xe Máy 78 & Xe Điện
+            </button>
+            <button type="button" onclick="toggleSkillPill(this, 'Khóa & Cửa Kính')" class="skill-pill px-2.5 py-1.5 rounded-xl border border-slate-700 bg-slate-900 text-slate-300 text-[11px] transition">
+              🪚 Khóa Vân Tay & Cửa Nhôm
+            </button>
+            <button type="button" onclick="toggleSkillPill(this, 'Sửa Nhà & Gạch')" class="skill-pill px-2.5 py-1.5 rounded-xl border border-slate-700 bg-slate-900 text-slate-300 text-[11px] transition">
+              🧱 Chống Thấm & Ốp Lát Gạch
+            </button>
+            <button type="button" onclick="toggleSkillPill(this, 'Bốc Xếp')" class="skill-pill px-2.5 py-1.5 rounded-xl border border-slate-700 bg-slate-900 text-slate-300 text-[11px] transition">
+              📦 Bốc Xếp & Chuyển Trọ
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="font-bold text-slate-300 block mb-1">Số năm kinh nghiệm thực chiến</label>
+            <input type="number" id="regWorkerExp" value="5" min="1" max="40" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-white">
+          </div>
+          <div>
+            <label class="font-bold text-slate-300 block mb-1">Số CCCD / Định danh thợ</label>
+            <input type="text" id="regWorkerCccd" placeholder="0540xxxx..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-white font-mono">
+          </div>
+        </div>
+      </div>
+
+      <!-- TRƯỜNG CHUNG CHO CẢ ĐĂNG NHẬP & ĐĂNG KÝ: SĐT VÀ MẬT KHẨU -->
+      <div class="space-y-3 pt-1">
+        <div>
+          <label class="font-bold text-slate-300 block mb-1">
+            Số điện thoại nhận tin nhắn & OTP <span class="text-red-400">*</span>
+          </label>
+          <input type="tel" id="inputAuthPhone" value="0977334455" placeholder="VD: 0977334455..." required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 font-mono font-bold text-amber-400 text-sm focus:outline-none focus:border-amber-400">
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="font-bold text-slate-300">Mật khẩu bảo mật <span class="text-red-400">*</span></label>
+            <button type="button" onclick="fillQuickOtp()" class="text-[10px] text-amber-400 hover:underline font-bold">
+              Đăng nhập OTP 6 số
+            </button>
+          </div>
+          <input type="password" id="inputAuthPassword" value="123456" placeholder="••••••••" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 font-mono text-white text-sm focus:outline-none focus:border-amber-400">
+        </div>
+      </div>
+
+      <!-- CHỌN GÓI THUÊ BAO SAAS CHO THỢ / GIAN HÀNG (CHỈ HIỆN KHI ĐĂNG KÝ) -->
+      <div id="sectionSubscriptionSelect" class="p-3.5 rounded-2xl bg-slate-900 border border-slate-700/80 space-y-2 hidden">
+        <div class="flex items-center justify-between text-xs">
+          <label class="font-bold text-white flex items-center gap-1.5">
+            <i class="fa-solid fa-crown text-amber-400"></i> Gói Thuê Bao Khởi Đầu:
+          </label>
+          <span class="text-[10px] bg-emerald-500/20 text-emerald-300 font-black px-2 py-0.5 rounded-full border border-emerald-500/40 animate-pulse">
+            🎁 Tặng 7 Ngày Dùng Thử
+          </span>
+        </div>
+        <select id="regSubscriptionPlan" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-medium text-xs focus:outline-none focus:border-amber-400">
+          <option value="plan_starter">Gói Khởi Nghiệp — 290.000đ/tháng (0% hoa hồng, Thợ độc lập)</option>
+          <option value="plan_local_business">Gói Doanh Nghiệp Địa Phương — 890.000đ/tháng (Cửa hàng / 5 thợ)</option>
+          <option value="plan_enterprise">Gói Đất Phú Enterprise — 1.990.000đ/tháng (Bot AI + Đội thợ)</option>
+          <option value="plan_meta_node">Gói Sovereign Meta-Node — 4.500.000đ/tháng (Độc quyền vùng)</option>
+        </select>
+        <div class="text-[10.5px] text-slate-400 flex items-center gap-1.5">
+          <i class="fa-solid fa-shield-check text-emerald-400"></i>
+          <span>Cam kết 0% hoa hồng từng cuốc. Đóng trước 6-12 tháng chiết khấu tới 25% + Tặng 1 tháng!</span>
+        </div>
+      </div>
+
+      <!-- HỘP CAM KẾT PHÁP LÝ & BẢO CHỨNG KÍN KẼ -->
+      <div class="p-3 rounded-2xl bg-slate-950 border border-slate-800 text-[11px] text-slate-400 space-y-1">
+        <label class="flex items-start gap-2 cursor-pointer select-none">
+          <input type="checkbox" id="chkAgreement" checked class="mt-0.5 accent-amber-400">
+          <span>Tôi cam kết tuân thủ <b>Quy tắc 6K Kín Kẽ OS™</b>, không tự ý nâng giá ngoài niêm yết K3, thực hiện đúng nghĩa vụ thuế và bảo chứng cho khách hàng.</span>
+        </label>
+      </div>
+
+      <!-- NÚT SUBMIT -->
+      <button type="submit" id="btnSubmitAuth" class="w-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-300 text-slate-950 font-black text-sm py-3.5 rounded-2xl shadow-xl shadow-amber-400/20 transition flex items-center justify-center gap-2 tracking-wide transform hover:-translate-y-0.5">
+        <i class="fa-solid fa-arrow-right-to-bracket text-base"></i>
+        <span id="btnSubmitText">Đăng Nhập Ngay</span>
+      </button>
+    </form>
+
+    <!-- 3. NÚT ĐĂNG NHẬP NHANH DEMO (1-CLICK TEST) -->
+    <div class="pt-3 border-t border-slate-800 space-y-2 text-center">
+      <div class="text-[10px] font-black uppercase text-slate-500 tracking-wider">Tài Khoản Thử Nghiệm Nhanh (1-Click):</div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px]">
+        <button type="button" onclick="quickFillAccount('0977334455', '123456', 'worker')" class="p-2 rounded-xl bg-slate-900 hover:bg-amber-500/10 border border-slate-800 hover:border-amber-500/40 text-slate-300 transition flex items-center justify-center gap-1.5 font-bold">
+          🛠️ Thợ Phú (0977...)
+        </button>
+        <button type="button" onclick="quickFillAccount('0914882341', '123456', 'merchant')" class="p-2 rounded-xl bg-slate-900 hover:bg-cyan-500/10 border border-slate-800 hover:border-cyan-500/40 text-slate-300 transition flex items-center justify-center gap-1.5 font-bold">
+          🏪 Tiệm Chị Ba (0914...)
+        </button>
+        <button type="button" onclick="quickFillAccount('0935889900', 'Datphu@2026', 'admin')" class="p-2 rounded-xl bg-slate-900 hover:bg-red-500/10 border border-slate-800 hover:border-red-500/40 text-slate-300 transition flex items-center justify-center gap-1.5 font-bold">
+          👑 Admin (0935...)
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="max-w-xl mx-auto w-full text-center text-[11px] text-slate-500 mt-6 space-y-1">
+    <div>Hệ thống thuộc bản quyền <b>CÔNG TY TNHH THƯƠNG MẠI ĐẤT PHÚ</b> (MST: 4401020233)</div>
+    <div>Trụ sở: Số 21/146 Ngô Gia Tự, TP. Tuy Hòa • Hotline kỹ thuật: 0935.889.900</div>
+  </footer>
+
+  <!-- ================= JAVASCRIPT AUTH LOGIC ================= -->
+  <script>
+    let currentRole = 'worker'; // 'merchant' hoặc 'worker'
+    let currentAuthMode = 'login'; // 'login' hoặc 'register'
+    let selectedSkills = ['Điện Lạnh Inverter'];
+
+    // CHỌN VAI TRÒ ĐỐI TÁC
+    function selectRole(role) {
+      currentRole = role;
+      const btnMerchant = document.getElementById("roleBtn-merchant");
+      const btnWorker = document.getElementById("roleBtn-worker");
+
+      if (role === 'merchant') {
+        btnMerchant.className = "role-btn py-2.5 rounded-xl text-xs font-black transition flex items-center justify-center gap-2 bg-amber-400 text-slate-950 shadow";
+        btnWorker.className = "role-btn py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 text-slate-400 hover:text-white";
+        document.getElementById("inputAuthPhone").value = "0914882341";
+      } else {
+        btnWorker.className = "role-btn py-2.5 rounded-xl text-xs font-black transition flex items-center justify-center gap-2 bg-amber-400 text-slate-950 shadow";
+        btnMerchant.className = "role-btn py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 text-slate-400 hover:text-white";
+        document.getElementById("inputAuthPhone").value = "0977334455";
+      }
+
+      updateFormDisplay();
+    }
+
+    // CHỌN CHẾ ĐỘ ĐĂNG NHẬP / ĐĂNG KÝ
+    function setAuthMode(mode) {
+      currentAuthMode = mode;
+      const btnLogin = document.getElementById("modeBtn-login");
+      const btnReg = document.getElementById("modeBtn-register");
+
+      if (mode === 'login') {
+        btnLogin.className = "px-3 py-1 rounded-lg font-black bg-blue-600 text-white transition";
+        btnReg.className = "px-3 py-1 rounded-lg font-bold text-slate-400 hover:text-white transition";
+      } else {
+        btnReg.className = "px-3 py-1 rounded-lg font-black bg-blue-600 text-white transition";
+        btnLogin.className = "px-3 py-1 rounded-lg font-bold text-slate-400 hover:text-white transition";
+      }
+
+      updateFormDisplay();
+    }
+
+    function updateFormDisplay() {
+      const isLogin = (currentAuthMode === 'login');
+      const isMerchant = (currentRole === 'merchant');
+
+      const titleEl = document.getElementById("formMainTitle");
+      const subTitleEl = document.getElementById("formSubTitle");
+      const submitTextEl = document.getElementById("btnSubmitText");
+
+      const merchantFields = document.getElementById("merchantRegisterFields");
+      const workerFields = document.getElementById("workerRegisterFields");
+
+      if (isLogin) {
+        titleEl.innerText = isMerchant ? "🏪 Đăng Nhập Chủ Gian Hàng Số" : "🛠️ Đăng Nhập Thợ Kỹ Thuật 6K";
+        subTitleEl.innerText = isMerchant ? "Quản lý đơn hàng, danh mục sản phẩm và đối soát VietQR" : "Bật trực ca On-Duty, nhận đơn cứu hộ 15P và chốt ví thu nhập";
+        submitTextEl.innerText = isMerchant ? "Đăng Nhập Gian Hàng" : "Đăng Nhập Nhận Ca 15P";
+
+        merchantFields.classList.add("hidden");
+        workerFields.classList.add("hidden");
+        document.getElementById("sectionSubscriptionSelect")?.classList.add("hidden");
+      } else {
+        titleEl.innerText = isMerchant ? "📝 Đăng Ký Mở Gian Hàng Mới" : "⚡ Đăng Ký Gia Nhập Đội Thợ 6K";
+        subTitleEl.innerText = isMerchant ? "Tiếp cận hàng nghìn khách hàng tại Phú Yên, cấp tài khoản số miễn phí" : "Cam kết khóa giá K3, có mặt 15P và nhận 95% thu nhập sòng phẳng";
+        submitTextEl.innerText = isMerchant ? "Mở Gian Hàng Số Ngay" : "Gia Nhập Đội Thợ 6K";
+        document.getElementById("sectionSubscriptionSelect")?.classList.remove("hidden");
+
+        if (isMerchant) {
+          merchantFields.classList.remove("hidden");
+          workerFields.classList.add("hidden");
+        } else {
+          merchantFields.classList.add("hidden");
+          workerFields.classList.remove("hidden");
+        }
+      }
+    }
+
+    // CHỌN KỸ NĂNG THỢ
+    function toggleSkillPill(btn, skillName) {
+      const idx = selectedSkills.indexOf(skillName);
+      if (idx !== -1) {
+        selectedSkills.splice(idx, 1);
+        btn.classList.remove("selected");
+      } else {
+        selectedSkills.push(skillName);
+        btn.classList.add("selected");
+      }
+    }
+
+    // ĐIỀN NHANH DEMO
+    function quickFillAccount(phone, pass, role) {
+      document.getElementById("inputAuthPhone").value = phone;
+      document.getElementById("inputAuthPassword").value = pass;
+      setAuthMode('login');
+      if (role === 'merchant') selectRole('merchant');
+      else if (role === 'worker') selectRole('worker');
+    }
+
+    function fillQuickOtp() {
+      const otp = "682188";
+      document.getElementById("inputAuthPassword").value = otp;
+      alert(`Mã OTP 6 số xác thực nhanh đã được điền tự động: [ ${otp} ]`);
+    }
+
+    // XỬ LÝ SUBMIT ĐĂNG NHẬP / ĐĂNG KÝ
+    async function handlePartnerAuthSubmit(event) {
+      event.preventDefault();
+
+      const phone = document.getElementById("inputAuthPhone").value.trim();
+      const password = document.getElementById("inputAuthPassword").value;
+      const isLogin = (currentAuthMode === 'login');
+
+      if (!document.getElementById("chkAgreement").checked) {
+        alert("Vui lòng đồng ý với Quy tắc 6K Kín Kẽ OS™ trước khi tiếp tục!");
+        return;
+      }
+
+      if (isLogin) {
+        // ĐĂNG NHẬP
+        try {
+          const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone, password })
+          });
+          const data = await res.json();
+
+          if (!res.ok || !data.success) {
+            alert("Lỗi đăng nhập: " + (data.error || "Vui lòng kiểm tra lại số điện thoại hoặc mật khẩu!"));
+            return;
+          }
+
+          // Lưu vào localStorage
+          localStorage.setItem('dp_auth_token', data.token);
+          localStorage.setItem('dp_auth_user', JSON.stringify(data.user));
+
+          alert(`🎉 ĐĂNG NHẬP THÀNH CÔNG!\n\n• Xin chào: ${data.user.fullName}\n• Vai trò: ${data.user.role === 'worker' ? 'Thợ Kỹ Thuật 6K' : (data.user.role === 'merchant' ? 'Chủ Gian Hàng' : 'Quản Trị Viên')}\n\nHệ thống đang chuyển hướng tới bảng điều khiển...`);
+
+          // Chuyển hướng theo vai trò
+          if (data.user.role === 'worker') {
+            window.location.href = './tho_gian_hang.html';
+          } else if (data.user.role === 'merchant') {
+            window.location.href = './ecommerce_marketplace.html';
+          } else {
+            window.location.href = './admin.html';
+          }
+        } catch (e) {
+          alert("Lỗi kết nối máy chủ: " + e.message);
+        }
+      } else {
+        // ĐĂNG KÝ
+        let payload = {
+          phone,
+          password,
+          role: currentRole
+        };
+
+        if (currentRole === 'merchant') {
+          payload.storeName = document.getElementById("regStoreName").value.trim();
+          payload.fullName = document.getElementById("regMerchantOwnerName").value.trim();
+          payload.category = document.getElementById("regMerchantCategory").value;
+          payload.storeAddress = document.getElementById("regMerchantAddress").value.trim();
+          payload.bankAccount = document.getElementById("regMerchantBankAccount").value.trim();
+          payload.bankName = document.getElementById("regMerchantBankName").value.trim();
+
+          if (!payload.storeName || !payload.fullName) {
+            alert("Vui lòng nhập Tên gian hàng và Họ tên chủ hộ!");
+            return;
+          }
+        } else {
+          payload.fullName = document.getElementById("regWorkerFullName").value.trim();
+          payload.district = document.getElementById("regWorkerDistrict").value;
+          payload.skills = selectedSkills;
+          payload.experienceYears = Number(document.getElementById("regWorkerExp").value) || 1;
+          payload.cccd = document.getElementById("regWorkerCccd").value.trim();
+
+          if (!payload.fullName) {
+            alert("Vui lòng nhập Họ tên thợ kỹ thuật!");
+            return;
+          }
+        }
+
+        try {
+          const res = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const data = await res.json();
+
+          if (!res.ok || !data.success) {
+            alert("Lỗi đăng ký: " + (data.error || "Không thể đăng ký tài khoản!"));
+            return;
+          }
+
+          localStorage.setItem('dp_auth_token', data.token);
+          localStorage.setItem('dp_auth_user', JSON.stringify(data.user));
+
+          alert(`✅ ĐĂNG KÝ THÀNH CÔNG VÀ ĐÃ KÍCH HOẠT TÀI KHOẢN!\n\n• Tài khoản: ${data.user.fullName} (${data.user.phone})\n• Vai trò: ${data.user.role === 'worker' ? 'Thợ Kỹ Thuật 6K' : 'Chủ Gian Hàng Số'}\n\nHệ thống đang mở Bảng điều khiển gian hàng...`);
+
+          if (data.user.role === 'worker') {
+            window.location.href = './tho_gian_hang.html';
+          } else {
+            window.location.href = './ecommerce_marketplace.html';
+          }
+        } catch (e) {
+          alert("Lỗi kết nối máy chủ: " + e.message);
+        }
+      }
+    }
+
+    // INIT
+    window.onload = function() {
+      // Kiểm tra tham số URL (?role=merchant hoặc ?role=worker)
+      const params = new URLSearchParams(window.location.search);
+      const paramRole = params.get('role');
+      if (paramRole === 'merchant' || paramRole === 'worker') {
+        selectRole(paramRole);
+      } else {
+        selectRole('worker');
+      }
+
+      const paramMode = params.get('mode');
+      if (paramMode === 'register') {
+        setAuthMode('register');
+      } else {
+        setAuthMode('login');
+      }
+    };
+  </script>
+</body>
+</html>

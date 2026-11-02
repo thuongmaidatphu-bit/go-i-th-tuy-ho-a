@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kho Dữ Liệu Hình Ảnh & Kiểm Duyệt Media — Đất Phú 6K</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              red: '#D32027',
+              navy: '#1B2A6B',
+              dark: '#070D1F',
+              card: '#0F1A36',
+              amber: '#F59E0B'
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-brand-dark text-slate-100 min-h-screen font-sans pb-16">
+
+  <!-- TOP HEADER -->
+  <header class="bg-brand-navy border-b border-blue-900/60 sticky top-0 z-40 backdrop-blur-md bg-opacity-95">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <a href="javascript:history.back()" class="w-9 h-9 rounded-lg bg-blue-950/70 border border-blue-800/60 flex items-center justify-center text-slate-300 hover:text-white">
+          <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-lg bg-brand-red flex items-center justify-center text-white font-black text-xs shadow-md">
+            <i class="fa-solid fa-photo-film"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-sm font-extrabold text-white tracking-wide uppercase">QUẢN TRỊ MEDIA ĐỐI TÁC</h1>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/40">
+                SUPABASE STORAGE RLS
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-400 font-medium">Kho Tư Liệu Công Trình & Kiểm Duyệt Tự Động Đất Phú Kín Kẽ OS™</p>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="simulateBatchUpload()" class="text-xs bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black px-3.5 py-2 rounded-xl shadow transition flex items-center gap-1.5">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <span class="hidden sm:inline">Mô Phỏng Tải 3 Ảnh</span>
+        </button>
+        <button onclick="loadMediaData()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-2 rounded-xl border border-slate-700 flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-rotate"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 pt-6 space-y-6">
+
+    <!-- 4 QUICK STATS CARDS -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-brand-card border border-blue-900/40 rounded-2xl p-4 shadow-xl">
+        <div class="flex items-center justify-between text-xs text-slate-400">
+          <span>Tổng Số Ảnh Đã Lưu</span>
+          <i class="fa-solid fa-images text-blue-400 text-base"></i>
+        </div>
+        <div class="text-2xl sm:text-3xl font-black text-white mt-2" id="statTotalImages">--</div>
+        <div class="text-[11px] text-slate-400 mt-1">Từ các gian hàng thợ & cửa hàng</div>
+      </div>
+
+      <div class="bg-brand-card border border-blue-900/40 rounded-2xl p-4 shadow-xl">
+        <div class="flex items-center justify-between text-xs text-slate-400">
+          <span>Dung Lượng Sử Dụng</span>
+          <i class="fa-solid fa-hard-drive text-amber-400 text-base"></i>
+        </div>
+        <div class="text-2xl sm:text-3xl font-black text-amber-400 mt-2" id="statStorageMb">-- MB</div>
+        <div class="text-[11px] text-emerald-400 font-semibold mt-1">Đã nén chuẩn WebP Asset-Light</div>
+      </div>
+
+      <div class="bg-brand-card border border-blue-900/40 rounded-2xl p-4 shadow-xl">
+        <div class="flex items-center justify-between text-xs text-slate-400">
+          <span>Băng Thông Tiêu Thụ</span>
+          <i class="fa-solid fa-network-wired text-purple-400 text-base"></i>
+        </div>
+        <div class="text-2xl sm:text-3xl font-black text-purple-400 mt-2" id="statBandwidth">-- MB</div>
+        <div class="text-[11px] text-slate-400 mt-1">Ước tính tải ảnh khách hàng</div>
+      </div>
+
+      <div class="bg-brand-card border border-blue-900/40 rounded-2xl p-4 shadow-xl">
+        <div class="flex items-center justify-between text-xs text-slate-400">
+          <span>Ảnh Bị Gắn Cờ / Cần Duyệt</span>
+          <i class="fa-solid fa-flag text-red-400 text-base"></i>
+        </div>
+        <div class="text-2xl sm:text-3xl font-black text-red-400 mt-2" id="statFlaggedCount">--</div>
+        <div class="text-[11px] text-red-300 font-semibold mt-1">Cần chủ sàn xử lý ngay</div>
+      </div>
+    </div>
+
+    <!-- FILTER & BATCH ACTION BAR -->
+    <div class="bg-brand-card border border-blue-900/40 rounded-2xl p-4 shadow-xl space-y-3">
+      <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        
+        <!-- BỘ LỌC THÔNG MINH -->
+        <div class="flex flex-wrap items-center gap-2 text-xs">
+          <span class="text-slate-400 font-semibold flex items-center gap-1">
+            <i class="fa-solid fa-filter text-amber-400"></i> Lọc:
+          </span>
+
+          <!-- Lọc Đối Tác -->
+          <select id="filterPartner" onchange="loadMediaData()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-white focus:outline-none focus:border-amber-400">
+            <option value="all">Tất cả Đối tác (Thợ/Shop)</option>
+            <option value="w_01">w_01 - Nguyễn Văn Đạt</option>
+            <option value="w_02">w_02 - Trần Minh Khoa</option>
+            <option value="w_03">w_03 - Lê Hoàng Nam</option>
+            <option value="shop-dienlanh-tuyhoa">Shop Điện Lạnh Phú Yên</option>
+          </select>
+
+          <!-- Lọc Danh Mục -->
+          <select id="filterCategory" onchange="loadMediaData()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-white focus:outline-none focus:border-amber-400">
+            <option value="all">Tất cả Danh mục</option>
+            <option value="PORTFOLIO">Công trình thực tế (Portfolio)</option>
+            <option value="WORK_SAMPLE">Mẫu việc đã làm (Work Sample)</option>
+            <option value="COVER">Biển hiệu / Gian hàng (Cover)</option>
+            <option value="PROFILE">Ảnh chân dung thợ (Profile)</option>
+            <option value="PRICE_LIST">Bảng giá niêm yết (Price List)</option>
+          </select>
+
+          <!-- Lọc Trạng Thái -->
+          <select id="filterStatus" onchange="loadMediaData()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-white focus:outline-none focus:border-amber-400">
+            <option value="all">Tất cả Trạng thái</option>
+            <option value="approved">Đã duyệt (Approved)</option>
+            <option value="flagged">Bị gắn cờ (Flagged)</option>
+          </select>
+        </div>
+
+        <!-- THAO TÁC HÀNG LOẠT (BATCH CONTROLS) -->
+        <div class="flex items-center gap-2">
+          <button onclick="toggleSelectAll()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-3 py-1.5 rounded-xl border border-slate-700 transition">
+            <span id="selectAllBtnText">Chọn Tất Cả</span>
+          </button>
+          <button onclick="executeBatchAction('approve')" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded-xl shadow transition flex items-center gap-1">
+            <i class="fa-solid fa-check"></i> Duyệt (<span class="selected-counter">0</span>)
+          </button>
+          <button onclick="executeBatchAction('flag')" class="text-xs bg-amber-600 hover:bg-amber-500 text-white font-bold px-3 py-1.5 rounded-xl shadow transition flex items-center gap-1">
+            <i class="fa-solid fa-flag"></i> Gắn Cờ (<span class="selected-counter">0</span>)
+          </button>
+          <button onclick="executeBatchAction('delete')" class="text-xs bg-red-600 hover:bg-red-500 text-white font-bold px-3 py-1.5 rounded-xl shadow transition flex items-center gap-1">
+            <i class="fa-solid fa-trash"></i> Xóa (<span class="selected-counter">0</span>)
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- MEDIA GRID CONTAINER -->
+    <div id="mediaGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div class="col-span-full text-center py-12 text-slate-500 text-xs">
+        <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i>
+        <div>Đang tải kho tư liệu hình ảnh...</div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- LIGHTBOX PREVIEW MODAL -->
+  <div id="lightboxModal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-blue-900/60 rounded-3xl max-w-3xl w-full overflow-hidden text-white shadow-2xl flex flex-col md:flex-row">
+      <div class="md:w-3/5 bg-black flex items-center justify-center p-2 min-h-[280px]">
+        <img id="lightboxImg" src="" alt="Preview" class="max-h-[70vh] w-auto object-contain rounded-xl">
+      </div>
+      <div class="md:w-2/5 p-5 space-y-3 flex flex-col justify-between">
+        <div class="space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <span id="lightboxCategoryBadge" class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/40">
+              PORTFOLIO
+            </span>
+            <button onclick="closeLightbox()" class="text-slate-400 hover:text-white text-lg">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+          <div>
+            <h4 class="font-extrabold text-sm text-white line-clamp-2" id="lightboxTitle">Tên tệp tin</h4>
+            <div class="text-xs text-amber-400 font-semibold mt-0.5" id="lightboxPartner">Thợ Kỹ Thuật</div>
+          </div>
+          <div class="space-y-1.5 text-xs text-slate-300 font-mono bg-slate-950 p-3 rounded-xl border border-slate-800">
+            <div class="flex justify-between"><span class="text-slate-500">Dung lượng:</span> <span id="lightboxSize" class="text-white">-- KB</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Kích thước:</span> <span id="lightboxDimensions" class="text-white">1080 x 720</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Định vị Geostamp:</span> <span id="lightboxGeostamp" class="text-amber-400">TP. Tuy Hòa</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Ngày đăng:</span> <span id="lightboxDate" class="text-slate-400">--</span></div>
+            <div class="flex justify-between"><span class="text-slate-500">Trạng thái:</span> <span id="lightboxStatus" class="text-emerald-400 font-bold">✔ Đã duyệt</span></div>
+          </div>
+        </div>
+        <div class="flex gap-2 pt-2">
+          <button onclick="singleActionLightbox('flag')" class="flex-1 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-xs font-bold text-white transition">Gắn Cờ</button>
+          <button onclick="singleActionLightbox('delete')" class="flex-1 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-xs font-bold text-white transition">Xóa Ảnh</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentMediaList = [];
+    let selectedImageIds = new Set();
+    let currentActiveLightboxId = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadMediaData();
+    });
+
+    async function loadMediaData() {
+      const partner = document.getElementById('filterPartner').value;
+      const category = document.getElementById('filterCategory').value;
+      const status = document.getElementById('filterStatus').value;
+
+      try {
+        const res = await fetch(`http://localhost:3456/api/storage/media-library?partnerId=${partner}&category=${category}&status=${status}`);
+        if (!res.ok) throw new Error('Không thể tải danh sách media');
+        const data = await res.json();
+
+        // Update stats
+        const s = data.stats || {};
+        document.getElementById('statTotalImages').innerText = s.totalImages || 0;
+        document.getElementById('statStorageMb').innerText = `${s.totalMegabytes || 0} MB`;
+        document.getElementById('statBandwidth').innerText = `${s.bandwidthEstimateMB || 0} MB`;
+        document.getElementById('statFlaggedCount').innerText = s.flaggedCount || 0;
+
+        currentMediaList = data.media || [];
+        selectedImageIds.clear();
+        updateSelectedCounter();
+        renderGrid();
+      } catch (e) {
+        console.error('Lỗi load media:', e);
+      }
+    }
+
+    function renderGrid() {
+      const container = document.getElementById('mediaGrid');
+      if (currentMediaList.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full text-center py-16 text-slate-500 text-xs space-y-2">
+            <i class="fa-regular fa-image text-4xl text-slate-600"></i>
+            <div>Không có hình ảnh nào thỏa mãn bộ lọc hiện tại.</div>
+          </div>
+        `;
+        return;
+      }
+
+      const catBadges = {
+        PORTFOLIO: 'bg-blue-500/20 text-blue-300 border-blue-500/40',
+        WORK_SAMPLE: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
+        COVER: 'bg-purple-500/20 text-purple-300 border-purple-500/40',
+        PROFILE: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
+        PRICE_LIST: 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+      };
+
+      container.innerHTML = currentMediaList.map(item => {
+        const isSelected = selectedImageIds.has(item.id);
+        const isFlagged = item.moderationStatus === 'flagged';
+        const kbSize = Math.round((item.fileSize || 0) / 1024);
+
+        return `
+          <div class="bg-brand-card border ${isFlagged ? 'border-red-500/80 ring-1 ring-red-500/50' : 'border-blue-900/30'} rounded-2xl overflow-hidden shadow-xl transition hover:border-blue-700/60 flex flex-col justify-between group">
+            
+            <!-- THUMBNAIL WRAPPER -->
+            <div class="relative overflow-hidden bg-slate-950 aspect-[4/3] cursor-pointer" onclick="openLightbox('${item.id}')">
+              <img src="${item.filePath}" alt="${item.fileName}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+              
+              <!-- Checkbox Select -->
+              <div class="absolute top-2.5 left-2.5 z-10" onclick="event.stopPropagation()">
+                <input type="checkbox" onchange="toggleSelectImage('${item.id}')" ${isSelected ? 'checked' : ''} class="w-4 h-4 rounded text-brand-red focus:ring-brand-red bg-slate-900/80 border-slate-600 cursor-pointer">
+              </div>
+
+              <!-- Category Badge -->
+              <div class="absolute top-2.5 right-2.5 z-10">
+                <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-md border backdrop-blur-md ${catBadges[item.category] || 'bg-slate-800 text-slate-300'}">
+                  ${item.category}
+                </span>
+              </div>
+
+              <!-- Flagged Warning Overlay -->
+              ${isFlagged ? `
+                <div class="absolute inset-0 bg-red-950/70 backdrop-blur-sm flex items-center justify-center p-3 text-center pointer-events-none">
+                  <div>
+                    <i class="fa-solid fa-triangle-exclamation text-red-400 text-xl mb-1"></i>
+                    <div class="text-[11px] font-bold text-red-200">ĐÃ BỊ GẮN CỜ VI PHẠM</div>
+                    <div class="text-[9px] text-red-300 mt-0.5 line-clamp-1">${item.flaggedReason || 'Cần kiểm tra'}</div>
+                  </div>
+                </div>
+              ` : ''}
+
+              <!-- Size Tag Bottom -->
+              <div class="absolute bottom-2 right-2 bg-black/70 px-2 py-0.5 rounded text-[10px] font-mono text-slate-300">
+                ${kbSize} KB • ${item.width || 1080}x${item.height || 720}
+              </div>
+            </div>
+
+            <!-- METADATA CARD BODY -->
+            <div class="p-3.5 space-y-2 text-xs">
+              <div>
+                <div class="font-bold text-white truncate text-xs" title="${item.fileName}">${item.fileName}</div>
+                <div class="text-[11px] text-amber-400 truncate mt-0.5">${item.partnerName || item.partnerId}</div>
+              </div>
+
+              <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-slate-800">
+                <span class="truncate">📍 ${item.locationGeostamp || 'Tuy Hòa'}</span>
+                <span>${new Date(item.createdAt).toLocaleDateString('vi-VN')}</span>
+              </div>
+
+              <!-- ACTIONS BAR -->
+              <div class="flex items-center gap-1.5 pt-1">
+                <button onclick="singleAction('${item.id}', 'approve')" class="flex-1 py-1 rounded-lg bg-emerald-600/30 hover:bg-emerald-600 text-emerald-300 hover:text-white text-[10px] font-bold border border-emerald-500/30 transition">
+                  Duyệt
+                </button>
+                <button onclick="singleAction('${item.id}', 'flag')" class="flex-1 py-1 rounded-lg bg-amber-600/30 hover:bg-amber-600 text-amber-300 hover:text-white text-[10px] font-bold border border-amber-500/30 transition">
+                  Gắn Cờ
+                </button>
+                <button onclick="singleAction('${item.id}', 'delete')" class="w-7 py-1 rounded-lg bg-red-600/30 hover:bg-red-600 text-red-300 hover:text-white text-[10px] font-bold border border-red-500/30 flex items-center justify-center transition">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+        `;
+      }).join('');
+    }
+
+    // SELECT CONTROLS
+    function toggleSelectImage(id) {
+      if (selectedImageIds.has(id)) selectedImageIds.delete(id);
+      else selectedImageIds.add(id);
+      updateSelectedCounter();
+    }
+
+    function toggleSelectAll() {
+      if (selectedImageIds.size === currentMediaList.length) {
+        selectedImageIds.clear();
+        document.getElementById('selectAllBtnText').innerText = 'Chọn Tất Cả';
+      } else {
+        currentMediaList.forEach(m => selectedImageIds.add(m.id));
+        document.getElementById('selectAllBtnText').innerText = 'Bỏ Chọn Hết';
+      }
+      updateSelectedCounter();
+      renderGrid();
+    }
+
+    function updateSelectedCounter() {
+      document.querySelectorAll('.selected-counter').forEach(el => {
+        el.innerText = selectedImageIds.size;
+      });
+    }
+
+    // BATCH ACTIONS
+    async function executeBatchAction(action) {
+      if (selectedImageIds.size === 0) {
+        alert('Vui lòng tích chọn ít nhất 1 hình ảnh để thao tác!');
+        return;
+      }
+
+      let reason = null;
+      if (action === 'flag') {
+        reason = prompt('Nhập lý do gắn cờ hình ảnh vi phạm:', 'Hình ảnh mờ hoặc không đúng chuyên môn sửa chữa');
+        if (!reason) return;
+      } else if (action === 'delete') {
+        if (!confirm(`Anh có chắc chắn muốn XÓA VĨNH VIỄN ${selectedImageIds.size} tệp ảnh đã chọn trên ổ đĩa E không?`)) return;
+      }
+
+      try {
+        const res = await fetch('http://localhost:3456/api/storage/moderate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            imageIds: Array.from(selectedImageIds),
+            action,
+            reason
+          })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          alert(`✔ Thao tác ${action.toUpperCase()} thành công trên ${data.affectedCount} tệp tin!`);
+          loadMediaData();
+        } else {
+          alert('Lỗi: ' + data.error);
+        }
+      } catch (err) {
+        alert('Lỗi kết nối: ' + err.message);
+      }
+    }
+
+    // SINGLE ACTION
+    async function singleAction(id, action) {
+      selectedImageIds.clear();
+      selectedImageIds.add(id);
+      await executeBatchAction(action);
+    }
+
+    // LIGHTBOX
+    function openLightbox(id) {
+      const item = currentMediaList.find(x => x.id === id);
+      if (!item) return;
+
+      currentActiveLightboxId = id;
+      document.getElementById('lightboxImg').src = item.filePath;
+      document.getElementById('lightboxTitle').innerText = item.fileName;
+      document.getElementById('lightboxPartner').innerText = item.partnerName || item.partnerId;
+      document.getElementById('lightboxCategoryBadge').innerText = item.category;
+      document.getElementById('lightboxSize').innerText = `${Math.round((item.fileSize || 0) / 1024)} KB`;
+      document.getElementById('lightboxDimensions').innerText = `${item.width || 1080} x ${item.height || 720} px`;
+      document.getElementById('lightboxGeostamp').innerText = item.locationGeostamp || 'Tuy Hòa, Phú Yên';
+      document.getElementById('lightboxDate').innerText = new Date(item.createdAt).toLocaleString('vi-VN');
+      
+      const stEl = document.getElementById('lightboxStatus');
+      if (item.moderationStatus === 'flagged') {
+        stEl.className = 'text-red-400 font-bold';
+        stEl.innerText = `⚠ Bị gắn cờ (${item.flaggedReason || 'Vi phạm'})`;
+      } else {
+        stEl.className = 'text-emerald-400 font-bold';
+        stEl.innerText = '✔ Đã duyệt chuẩn 6K';
+      }
+
+      document.getElementById('lightboxModal').classList.remove('hidden');
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightboxModal').classList.add('hidden');
+    }
+
+    async function singleActionLightbox(action) {
+      if (!currentActiveLightboxId) return;
+      closeLightbox();
+      await singleAction(currentActiveLightboxId, action);
+    }
+
+    // SIMULATE BATCH UPLOAD FOR TESTING
+    async function simulateBatchUpload() {
+      // 1x1 base64 transparent gif placeholder
+      const dummyBase64 = "data:image/webp;base64,UklGRkAAAABXRUJQVlA4IDQAAADwAQCdASoBAAEAAQAcJaACdLoAAP7/2QAA";
+      
+      const payload = {
+        partnerId: "w_01",
+        partnerName: "Nguyễn Văn Đạt (Điện Lạnh 6K)",
+        files: [
+          {
+            fileName: "lap_dat_ong_dong_daikin_inverter.webp",
+            category: "PORTFOLIO",
+            width: 1080,
+            height: 720,
+            locationGeostamp: "Đại lộ Hùng Vương, TP. Tuy Hòa",
+            base64Data: dummyBase64
+          },
+          {
+            fileName: "bao_gia_thay_loc_may_lanh_chuan_k3.webp",
+            category: "PRICE_LIST",
+            width: 900,
+            height: 1200,
+            locationGeostamp: "Trung tâm Điều phối Đất Phú",
+            base64Data: dummyBase64
+          },
+          {
+            fileName: "ve_sinh_khoang_may_giat_panasonic.webp",
+            category: "WORK_SAMPLE",
+            width: 1080,
+            height: 810,
+            locationGeostamp: "Phường 7, TP. Tuy Hòa",
+            base64Data: dummyBase64
+          }
+        ]
+      };
+
+      try {
+        const res = await fetch('http://localhost:3456/api/storage/upload-batch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert(`🎉 Đã mô phỏng tải lên thành công 3 tệp hình ảnh vào hệ thống!`);
+          loadMediaData();
+        } else {
+          alert('Lỗi: ' + data.error);
+        }
+      } catch (e) {
+        alert('Lỗi kết nối: ' + e.message);
+      }
+    }
+  </script>
+</body>
+</html>
